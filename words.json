@@ -1,5 +1,4 @@
-[
-    { "id": 1, "level": 1, "eng": "Efficient", "heb": "יעיל", "pos": "Adjective", "sentence": "This new engine is highly efficient and saves fuel.", "hint": "An efficient worker can finish the task in half the time.", "points": 0, "status": "new" },
+{ "id": 1, "level": 1, "eng": "Efficient", "heb": "יעיל", "pos": "Adjective", "sentence": "This new engine is highly efficient and saves fuel.", "hint": "An efficient worker can finish the task in half the time.", "points": 0, "status": "new" },
     { "id": 2, "level": 1, "eng": "Component", "heb": "רכיב, מרכיב", "pos": "Noun", "sentence": "The motherboard is a critical component of the computer.", "hint": "Trust is a vital component of any good relationship.", "points": 0, "status": "new" },
     { "id": 3, "level": 1, "eng": "Fluctuate", "heb": "להתנדנד, לעלות ולרדת", "pos": "Verb", "sentence": "The stock market index can fluctuate wildly during a crisis.", "hint": "The temperature in the desert tends to fluctuate between day and night.", "points": 0, "status": "new" },
     { "id": 4, "level": 1, "eng": "Consistent", "heb": "עקבי", "pos": "Adjective", "sentence": "To see results in your training, you must be consistent.", "hint": "The restaurant is popular because of its consistent food quality.", "points": 0, "status": "new" },
@@ -139,4 +138,3 @@
     { "id": 138, "level": 2, "eng": "Precise", "heb": "מדויק", "pos": "Adjective", "sentence": "The builder needs precise measurements to cut the wood.", "hint": "He arrived at the precise moment the movie started.", "points": 0, "status": "new" },
     { "id": 139, "level": 2, "eng": "Prohibit", "heb": "לאסור, למנוע", "pos": "Verb", "sentence": "The rules strictly prohibit using phones during the exam.", "hint": "The high cost will prohibit many people from buying it.", "points": 0, "status": "new" },
     { "id": 140, "level": 2, "eng": "Rational", "heb": "הגיוני, רציונלי", "pos": "Adjective", "sentence": "Try to stay calm and make a rational decision.", "hint": "There is no rational explanation for his strange behavior.", "points": 0, "status": "new" }
-]
