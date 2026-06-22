@@ -23,7 +23,6 @@
         .progress-bar { width: 100%; height: 8px; background-color: #e0e0e0; border-radius: 10px; margin-top: 15px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background-color: var(--level-color); transition: width 0.4s ease; }
 
-        /* עיצוב כפתורי הרמות */
         .level-btn { width: 100%; background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: none; font-size: 1.2rem; font-weight: 700; cursor: default; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; border-right: 6px solid #ccc; opacity: 0.5; color: var(--text-secondary); }
         .level-btn.loaded { opacity: 1; cursor: pointer; pointer-events: auto; }
         .level-btn.loaded:active { transform: scale(0.97); }
@@ -146,6 +145,13 @@
         let usedHintInCurrentQuestion = false;
         let currentTriageWord, currentFlashcardWord, currentQuizWord;
 
+        // פונקציה לשמירת ההתקדמות של מילה בודדת
+        function saveWordProgress(wordObj) {
+            let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
+            savedProgress[wordObj.id] = { status: wordObj.status, points: wordObj.points };
+            localStorage.setItem('asaf_vocab_progress', JSON.stringify(savedProgress));
+        }
+
         window.onload = () => {
             fetch(url)
                 .then(res => res.text())
@@ -153,21 +159,28 @@
                     const jsonStr = text.substring(47).slice(0, -2);
                     const json = JSON.parse(jsonStr);
                     
-                    fullDB = json.table.rows.map(row => ({
-                        id: row.c[0] ? row.c[0].v : null,
-                        level: row.c[1] ? Number(row.c[1].v) : 1,
-                        eng: row.c[2] ? row.c[2].v : '',
-                        heb: row.c[3] ? row.c[3].v : '',
-                        pos: row.c[4] ? row.c[4].v : '',
-                        sentence: row.c[5] ? row.c[5].v : '',
-                        hint: row.c[6] ? row.c[6].v : '',
-                        points: 0,
-                        status: "new"
-                    })).filter(w => typeof w.id === 'number');
+                    // טעינת ההתקדמות השמורה מהזיכרון
+                    let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
+
+                    fullDB = json.table.rows.map(row => {
+                        let id = row.c[0] ? row.c[0].v : null;
+                        let saved = savedProgress[id] || { status: "new", points: 0 }; // שימוש בזיכרון אם קיים
+                        
+                        return {
+                            id: id,
+                            level: row.c[1] ? Number(row.c[1].v) : 1,
+                            eng: row.c[2] ? row.c[2].v : '',
+                            heb: row.c[3] ? row.c[3].v : '',
+                            pos: row.c[4] ? row.c[4].v : '',
+                            sentence: row.c[5] ? row.c[5].v : '',
+                            hint: row.c[6] ? row.c[6].v : '',
+                            points: saved.points,
+                            status: saved.status
+                        };
+                    }).filter(w => typeof w.id === 'number');
 
                     document.getElementById('loading-msg').innerText = "✅ מחובר בהצלחה לגוגל שיטס!";
                     
-                    // מנגנון הזיכרון לנעילת רמות
                     let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
                     const levelsContainer = document.getElementById('levels-container');
                     levelsContainer.innerHTML = '';
@@ -221,7 +234,7 @@
             startTriage();
         }
 
-        // ================= מסננת ופתיחת שלבים =================
+        // ================= מסננת =================
         function startTriage() {
             let newWords = getWordsByStatus("new");
             if (newWords.length === 0) {
@@ -238,7 +251,7 @@
                     } else {
                         alert("כל הכבוד! סיימת לאמן את כל המילים ברמה זו.");
                     }
-                    location.reload(); // רענון כדי לעדכן את המנעולים
+                    location.reload(); 
                 }
                 return;
             }
@@ -250,7 +263,13 @@
             currentTriageWord = wordObj;
             document.getElementById('triage-eng').innerText = wordObj.eng;
             document.getElementById('triage-heb').innerText = wordObj.heb;
-            document.getElementById('triage-progress').style.width = ((currentTriageIndex) / 10) * 100 + "%";
+            
+            // חישוב התקדמות לפי כמה מילים סיים מתוך סך המילים ברמה
+            let totalWords = currentLevelDB.length;
+            let masteredCount = getWordsByStatus("mastered").length;
+            let learningCount = getWordsByStatus("learning").length;
+            let progressPercent = ((masteredCount + learningCount) / totalWords) * 100;
+            document.getElementById('triage-progress').style.width = progressPercent + "%";
 
             document.getElementById('triage-heb').style.display = 'none';
             document.getElementById('triage-audio-btn').style.display = 'none';
@@ -273,6 +292,9 @@
                 currentTriageWord.status = "learning";
                 sessionWords.push(currentTriageWord);
             }
+            
+            saveWordProgress(currentTriageWord); // שמירה בזיכרון המקומי
+
             currentTriageIndex++;
             let newWords = getWordsByStatus("new");
             if (sessionWords.length >= 10 || newWords.length === 0) { 
@@ -356,6 +378,9 @@
                 currentQuizWord.points = 0;
                 allBtns.forEach(b => { if (b.innerText === currentQuizWord.heb) b.classList.add('correct'); });
             }
+            
+            saveWordProgress(currentQuizWord); // שמירה בזיכרון המקומי
+
             setTimeout(() => {
                 currentQuizIndex++;
                 if (currentQuizIndex >= sessionWords.length) endSession();
