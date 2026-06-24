@@ -234,21 +234,17 @@
 
         // --- אתחול מערכת ---
         window.onload = () => {
-            // הגדרות עיצוב
             let savedTheme = localStorage.getItem('asaf_vocab_theme') || 'system';
             document.getElementById('theme-select').value = savedTheme;
             applyTheme(savedTheme);
             
-            // הגדרות סאונד
             let savedSound = localStorage.getItem('asaf_vocab_autosound') || 'off';
             document.getElementById('auto-sound-select').value = savedSound;
 
-            // האזנה לשינויים במערכת ההפעלה של הטלפון
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 if(localStorage.getItem('asaf_vocab_theme') === 'system') applyTheme('system');
             });
 
-            // משיכת נתונים
             fetch(url)
                 .then(res => res.text())
                 .then(text => {
@@ -335,7 +331,7 @@
             }
         }
 
-        // ================= בחירת רמה והתחלה =================
+        // ================= התחלת רמה =================
         function startLevel(levelNum, colorHex) {
             document.documentElement.style.setProperty('--level-color', colorHex);
             document.getElementById('triage-title').innerText = `מסננת מילים - רמה ${levelNum}`;
@@ -345,35 +341,45 @@
                 alert("עוד לא הזנת מילים לרמה הזו בגוגל שיטס!");
                 return;
             }
-            switchScreen('screen-triage');
-            startTriage();
+            
+            // המוח החדש נכנס לפעולה
+            manageSessionFlow();
+        }
+
+        // ================= מנהל התור החכם (הפתרון לבאג) =================
+        function manageSessionFlow() {
+            // 1. קודם כל בודקים אם יש מילים בסטטוס "למידה" שצריך לסיים
+            let allLearning = getWordsByStatus("learning");
+            if (allLearning.length > 0) {
+                // לוקחים עד 10 מילים כדי לא להעמיס אם יצאת אחרי הרבה סינונים
+                sessionWords = allLearning.slice(0, 10);
+                startFlashcards();
+                return;
+            }
+
+            // 2. אם הכל נקי, בודקים אם נשארו מילים חדשות לסנן
+            let newWords = getWordsByStatus("new");
+            if (newWords.length > 0) {
+                switchScreen('screen-triage');
+                currentTriageIndex = 0;
+                loadTriageWord(newWords[currentTriageIndex]);
+                return;
+            }
+
+            // 3. אם אין מה ללמוד ואין מה לסנן - ניצחת את הרמה!
+            let currentLevel = currentLevelDB[0].level;
+            let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
+            
+            if (currentLevel >= maxUnlocked && currentLevel < 30) {
+                localStorage.setItem('asaf_vocab_level', currentLevel + 1);
+                alert("🎉 אלוף! השתלטת על כל המילים. הרמה הבאה נפתחה עבורך!");
+            } else {
+                alert("כל הכבוד! סיימת לאמן את כל המילים ברמה זו.");
+            }
+            location.reload(); 
         }
 
         // ================= מסננת =================
-        function startTriage() {
-            let newWords = getWordsByStatus("new");
-            if (newWords.length === 0) {
-                sessionWords = getWordsByStatus("learning");
-                if(sessionWords.length > 0) {
-                    startFlashcards();
-                } else {
-                    let currentLevel = currentLevelDB[0].level;
-                    let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
-                    
-                    if (currentLevel >= maxUnlocked && currentLevel < 30) {
-                        localStorage.setItem('asaf_vocab_level', currentLevel + 1);
-                        alert("🎉 אלוף! השתלטת על כל המילים. הרמה הבאה נפתחה עבורך!");
-                    } else {
-                        alert("כל הכבוד! סיימת לאמן את כל המילים ברמה זו.");
-                    }
-                    location.reload(); 
-                }
-                return;
-            }
-            currentTriageIndex = 0;
-            loadTriageWord(newWords[currentTriageIndex]);
-        }
-
         function loadTriageWord(wordObj) {
             currentTriageWord = wordObj;
             document.getElementById('triage-eng').innerText = wordObj.eng;
@@ -413,9 +419,14 @@
 
             currentTriageIndex++;
             let newWords = getWordsByStatus("new");
+            
+            // אם אספנו מספיק מילים לאימון או שנגמרו המילים החדשות
             if (sessionWords.length >= 10 || newWords.length === 0) { 
-                if(sessionWords.length > 0) startFlashcards();
-                else startTriage();
+                if(sessionWords.length > 0) {
+                    startFlashcards();
+                } else {
+                    manageSessionFlow(); // בדיקה חכמה מה הלאה
+                }
             } else {
                 loadTriageWord(newWords[0]); 
             }
@@ -444,7 +455,6 @@
         function nextFlashcard() {
             currentFlashcardIndex++;
             if (currentFlashcardIndex >= sessionWords.length) {
-                // המעבר החדש: שואל את המשתמש איך להמשיך!
                 switchScreen('screen-flashcard-choice');
             } else {
                 loadFlashcard(sessionWords[currentFlashcardIndex]);
@@ -511,8 +521,7 @@
         }
         function endSession() {
             sessionWords = [];
-            switchScreen('screen-triage');
-            startTriage();
+            manageSessionFlow(); // חזרה למוח המרכזי כדי שיחליט מה לעשות עכשיו
         }
     </script>
 </body>
