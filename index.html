@@ -8,7 +8,773 @@
     <style>
         /* משתני צבע תומכי מצב לילה */
         :root {
+            --level-color: #0077b6; <!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>לומדת אוצר מילים - אסף</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
             --level-color: #0077b6; 
+            --bg-color: #f4f6f8; 
+            --card-bg: #ffffff;
+            --text-main: #2b2d42; 
+            --text-secondary: #8d99ae;
+            --success: #2a9d8f; 
+            --danger: #e76f51; 
+            --warning: #f4a261;
+            --sentence-bg: #f8f9fa; 
+            --badge-bg: #e0e0e0; 
+            --quiz-hint-bg: #fff3cd;
+            --btn-sec-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --nav-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212; 
+            --card-bg: #1e1e1e;
+            --text-main: #f0f0f0; 
+            --text-secondary: #aaaaaa;
+            --sentence-bg: #2b2b2b; 
+            --badge-bg: #333333; 
+            --quiz-hint-bg: #382d10;
+            --btn-sec-bg: #2a2a2a;
+            --border-color: #444444;
+            --nav-bg: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 90px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+
+        .screen { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.3s ease; flex-direction: column; align-items: center; }
+        .screen.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header { text-align: center; width: 100%; margin-bottom: 20px; position: relative; }
+        .progress-bar { width: 100%; height: 8px; background-color: var(--badge-bg); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background-color: var(--level-color); transition: width 0.4s ease; }
+
+        /* כרטיסי סטטיסטיקה */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 20px; }
+        .stat-card { background: var(--card-bg); padding: 12px 5px; border-radius: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+        .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--level-color); }
+        .stat-lbl { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+        .streak-container { background: var(--card-bg); width: 100%; padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+
+        .level-btn { width: 100%; background: var(--card-bg); padding: 18px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: none; font-size: 1.1rem; font-weight: 700; cursor: default; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; border-right: 6px solid #ccc; opacity: 0.5; color: var(--text-secondary); margin-bottom: 12px;}
+        .level-btn.loaded { opacity: 1; cursor: pointer; pointer-events: auto; color: var(--text-main); }
+        .level-btn.loaded:active { transform: scale(0.97); }
+
+        #levels-container { width: 100%; display: flex; flex-direction: column; max-height: 45vh; overflow-y: auto; padding-right: 5px; padding-bottom: 10px; }
+        #levels-container::-webkit-scrollbar { width: 5px; }
+        #levels-container::-webkit-scrollbar-thumb { background-color: var(--text-secondary); border-radius: 10px; }
+
+        #loading-msg { color: var(--text-secondary); margin-bottom: 15px; font-weight: 600; text-align: center;}
+
+        /* מסננת */
+        .triage-card { background: var(--card-bg); width: 100%; padding: 25px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; border-top: 6px solid var(--level-color); cursor: pointer; transition: 0.2s; }
+        .triage-eng { font-size: 2.5rem; font-weight: 700; direction: ltr; margin-bottom: 10px; color: var(--text-main);}
+        .triage-heb { font-size: 1.8rem; color: var(--level-color); margin-bottom: 25px; display: none; }
+        .triage-actions { display: flex; gap: 15px; width: 100%; display: none; }
+        .btn-triage { flex: 1; padding: 15px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-know { background-color: var(--success); }
+        .btn-dont-know { background-color: var(--danger); }
+
+        /* כרטיסיות שינון */
+        .card-container { width: 100%; height: 360px; perspective: 1000px; cursor: pointer; margin-bottom: 25px; }
+        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1); box-shadow: 0 8px 25px rgba(0,0,0,0.05); border-radius: 24px; }
+        .card.is-flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--card-bg); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center; border-top: 8px solid var(--level-color); }
+        .card-back { transform: rotateY(180deg); }
+        .word-eng { font-size: 2.6rem; font-weight: 700; margin-bottom: 10px; direction: ltr; color: var(--text-main);}
+        .part-of-speech { font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+        .word-heb { font-size: 2.3rem; font-weight: 700; color: var(--level-color); margin-bottom: 20px; }
+        .sentence { font-size: 1.15rem; color: var(--text-main); direction: ltr; line-height: 1.5; padding: 12px; background-color: var(--sentence-bg); border-radius: 12px; width: 100%; border-left: 4px solid var(--level-color); }
+        
+        /* מבחן אמריקאי */
+        .quiz-question { font-size: 2.3rem; font-weight: 700; direction: ltr; margin-bottom: 25px; text-align: center; color: var(--level-color); }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .btn-option { background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); padding: 16px; border-radius: 16px; font-size: 1.15rem; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-option.correct { background-color: var(--success); color: white; border-color: var(--success); }
+        .btn-option.wrong { background-color: var(--danger); color: white; border-color: var(--danger); }
+        
+        .hint-container { margin-top: 20px; width: 100%; text-align: center; }
+        .btn-hint { background: none; border: none; color: var(--warning); font-size: 1.1rem; font-weight: 600; cursor: pointer; padding: 5px; }
+        .hint-text { display: none; margin-top: 12px; font-size: 1.05rem; color: var(--text-main); background: var(--quiz-hint-bg); padding: 12px; border-radius: 10px; direction: ltr; border-left: 4px solid var(--warning); }
+
+        /* קונטרולים וסרגל ניווט תחתון */
+        .controls { display: flex; gap: 15px; width: 100%; }
+        .btn-main { flex: 1; padding: 16px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 16px; cursor: pointer; transition: 0.2s; background-color: var(--level-color); color: #ffffff; }
+        .btn-secondary { background-color: var(--btn-sec-bg); color: var(--text-main); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); flex: 1; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer;}
+        .btn-reset { background-color: var(--card-bg); color: var(--danger); border: 2px solid var(--danger); width: 100%; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .status-badge { background: var(--badge-bg); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 10px; display: inline-block; color: var(--text-main);}
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.04); z-index: 100; max-width: 500px; margin: 0 auto; border-radius: 16px 16px 0 0; }
+        .nav-item { background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 20px; transition: 0.2s; }
+        .nav-item.active { color: var(--level-color); transform: translateY(-2px); }
+        .nav-item-icon { font-size: 1.4rem; }
+
+        .setting-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px; background: var(--card-bg); border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);}
+        .setting-row select { padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--btn-sec-bg); color: var(--text-main); font-size: 1rem;}
+
+        /* חדר כושר שליפה אקטיבית */
+        .gym-input-wrapper { width: 100%; position: relative; margin: 20px 0; }
+        .gym-input { width: 100%; padding: 16px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 16px; font-size: 1.3rem; text-align: center; outline: none; direction: ltr; font-weight: 600; transition: 0.2s; }
+        .gym-input:focus { border-color: var(--level-color); }
+        .gym-input.correct { border-color: var(--success); background-color: rgba(42, 157, 143, 0.1); }
+        .gym-input.wrong { border-color: var(--danger); background-color: rgba(231, 111, 81, 0.1); }
+        .gym-feedback { font-size: 1.2rem; font-weight: 700; margin-top: 10px; display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="screen-dashboard" class="screen active">
+        <div class="header">
+            <h2 style="font-size: 2rem;">הלומדה של אסף</h2>
+            <p style="color: var(--text-secondary); margin-top: 3px;">מערכת למידה חכמה</p>
+        </div>
+
+        <div class="streak-container">
+            <span style="font-size: 1.1rem; font-weight: 600;">רצף למידה יומי:</span>
+            <span style="font-size: 1.3rem; font-weight: 700;" id="dash-streak">🔥 0 ימים</span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="stat-mastered">0</div>
+                <div class="stat-lbl">שולט (Master)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-learning">0</div>
+                <div class="stat-lbl">בלמידה</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-total">0</div>
+                <div class="stat-lbl">סך הכל במאגר</div>
+            </div>
+        </div>
+
+        <div id="loading-msg">מתחבר לגוגל שיטס שלך... ⏳</div>
+        <div id="levels-container"></div>
+    </div>
+
+    <div id="screen-review-gym" class="screen">
+        <div class="header">
+            <h2>חדר כושר לחזרות</h2>
+            <p style="color: var(--text-secondary); margin-top: 3px;">שליפה אקטיבית בהקלדה למילים שאתה שולט בהן</p>
+            <div class="progress-bar"><div class="progress-fill" id="gym-progress"></div></div>
+        </div>
+
+        <div id="gym-empty-state" style="display:none; text-align:center; padding: 40px 20px;">
+            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;">חדר הכושר נעול זמנית! 🔒</p>
+            <p style="color: var(--text-secondary);">עליך להעביר לפחות מילה אחת למעמד "שולט" (Mastered) דרך השלבים הרגילים כדי להתחיל להתאמן פה.</p>
+        </div>
+
+        <div id="gym-active-zone" style="width: 100%;">
+            <div class="triage-card" style="cursor: default; border-top-color: var(--warning);">
+                <div class="part-of-speech" id="gym-pos">Noun</div>
+                <div class="word-heb" id="gym-heb" style="display: block; font-size: 2.4rem; margin-bottom: 15px;">מילה בעברית</div>
+                <div class="sentence" id="gym-sentence">Sentence structure goes here...</div>
+            </div>
+
+            <div class="gym-input-wrapper">
+                <input type="text" id="gym-user-input" class="gym-input" placeholder="הקלד את המילה באנגלית..." autocomplete="off" autocapitalize="off" spellcheck="false">
+                <div id="gym-feedback-msg" class="gym-feedback"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-secondary" id="gym-btn-skip" onclick="switchTab('screen-dashboard')">עצור אימון</button>
+                <button class="btn-main" id="gym-btn-action" onclick="checkGymAnswer()">בדוק תשובה</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-settings" class="screen">
+        <div class="header">
+            <h2>הגדרות מערכת</h2>
+        </div>
+        
+        <div class="setting-row">
+            <span>מראה ותצוגה:</span>
+            <select id="theme-select" onchange="changeTheme(this.value)">
+                <option value="system">מערכת</option>
+                <option value="light">בהיר</option>
+                <option value="dark">כהה (Dark Mode)</option>
+            </select>
+        </div>
+
+        <div class="setting-row">
+            <span>קריאת מילים אוטומטית:</span>
+            <select id="auto-sound-select" onchange="localStorage.setItem('asaf_vocab_autosound', this.value)">
+                <option value="off">כבוי</option>
+                <option value="on">מופעל</option>
+            </select>
+        </div>
+
+        <div style="margin-top: 40px; width: 100%;">
+            <p style="text-align: center; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem;">ניהול מאגר מקומי</p>
+            <button class="btn-reset" onclick="resetAppProgress()">🗑️ איפוס כל התקדמות הלמידה</button>
+        </div>
+    </div>
+
+    <div id="screen-triage" class="screen">
+        <div class="header">
+            <h2 id="triage-title">מסננת מילים</h2>
+            <div class="progress-bar"><div class="progress-fill" id="triage-progress"></div></div>
+        </div>
+        <div class="triage-card" onclick="revealTriageHebrew()">
+            <div class="triage-eng" id="triage-eng">Word</div>
+            <div id="triage-tap-hint" style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 20px;">👆 הקלק על הכרטיסייה כדי לראות תרגום</div>
+            <div class="triage-heb" id="triage-heb">מילה</div>
+            <button class="btn-secondary" id="triage-audio-btn" style="margin-bottom: 25px; width: 100%; display: none;" onclick="speakWord(currentTriageWord.eng); event.stopPropagation();">🔊 השמע</button>
+            <div class="triage-actions" id="triage-actions">
+                <button class="btn-triage btn-dont-know" onclick="handleTriage(false); event.stopPropagation();">❌ לא מכיר</button>
+                <button class="btn-triage btn-know" onclick="handleTriage(true); event.stopPropagation();">✅ מכיר</button>
+            </div>
+        </div>
+        <button class="btn-secondary" style="width:100%; margin-top: 15px;" onclick="abortSession()">חזור לתפריט</button>
+    </div>
+
+    <div id="screen-flashcards" class="screen">
+        <div class="header">
+            <h2>זמן שינון</h2>
+            <div class="status-badge" id="fc-points-badge">נקודות שליטה: 0/2</div>
+            <div class="progress-bar"><div class="progress-fill" id="fc-progress"></div></div>
+        </div>
+        <div class="card-container" id="flashcard" onclick="toggleCard()">
+            <div class="card" id="card-inner">
+                <div class="card-face card-front">
+                    <div class="part-of-speech" id="fc-pos">Noun</div>
+                    <div class="word-eng" id="fc-eng">Word</div>
+                    <div style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 30px;">הקלק כדי להפוך</div>
+                </div>
+                <div class="card-face card-back">
+                    <div class="word-heb" id="fc-heb">מילה</div>
+                    <div class="sentence" id="fc-sentence">Sentence</div>
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn-secondary" onclick="speakWord(currentFlashcardWord.eng)">🔊 השמע</button>
+            <button class="btn-main" onclick="nextFlashcard()">הבא ➔</button>
+        </div>
+    </div>
+
+    <div id="screen-flashcard-choice" class="screen">
+        <div class="header">
+            <h2 style="font-size: 2.2rem; color: var(--level-color);">סיימת לשנן!</h2>
+            <p style="margin-top: 10px; font-size: 1.1rem;">מה עושים עכשיו?</p>
+        </div>
+        <button class="btn-secondary" style="width:100%; margin-bottom: 20px;" onclick="startFlashcards()">🔄 חזור שוב על הכרטיסיות</button>
+        <button class="btn-main" style="width:100%; font-size: 1.3rem;" onclick="startQuiz()">📝 יאללה למבחן</button>
+    </div>
+
+    <div id="screen-quiz" class="screen">
+        <div class="header">
+            <h2>מיני-מבחן</h2>
+            <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
+        </div>
+        <div class="quiz-question" id="quiz-eng">Word</div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="hint-container">
+            <button class="btn-hint" id="btn-hint" onclick="showHint()">💡 לחץ לרמז משפט</button>
+            <div class="hint-text" id="quiz-hint">Hint</div>
+        </div>
+    </div>
+
+    <div class="bottom-nav" id="bottom-nav">
+        <button class="nav-item active" id="nav-screen-dashboard" onclick="switchTab('screen-dashboard')">
+            <span class="nav-item-icon">🏠</span><span>בית</span>
+        </button>
+        <button class="nav-item" id="nav-screen-review-gym" onclick="switchTab('screen-review-gym')">
+            <span class="nav-item-icon">🏋️</span><span>חדר כושר</span>
+        </button>
+        <button class="nav-item" id="nav-screen-settings" onclick="switchTab('screen-settings')">
+            <span class="nav-item-icon">⚙️</span><span>הגדרות</span>
+        </button>
+    </div>
+
+    <script>
+        const sheetId = '1YYCJ8-g4v2tK9hLLK4U64MyT3PPDeZR6C9IEAwOKYDc';
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+        let fullDB = [], currentLevelDB = [], sessionWords = []; 
+        let currentTriageIndex = 0, currentFlashcardIndex = 0, currentQuizIndex = 0;
+        let usedHintInCurrentQuestion = false;
+        let currentTriageWord, currentFlashcardWord, currentQuizWord;
+
+        // משתני חדר כושר
+        let gymWords = [], currentGymIndex = 0, currentGymWord = null, gymChecked = false;
+
+        // --- ניהול מראה ועיצוב ---
+        function applyTheme(theme) {
+            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        }
+        function changeTheme(theme) {
+            localStorage.setItem('asaf_vocab_theme', theme);
+            applyTheme(theme);
+        }
+
+        // --- פידבק תחושתי (Haptic) ---
+        function triggerHaptic(type) {
+            if (navigator.vibrate) {
+                if (type === 'success') navigator.vibrate(40);
+                if (type === 'error') navigator.vibrate([60, 50, 60]);
+            }
+        }
+
+        // --- ניהול רצף למידה יומי (Streak) ---
+        function updateAndGetStreak() {
+            let today = new Date().toDateString();
+            let lastDate = localStorage.getItem('asaf_vocab_last_date');
+            let currentStreak = parseInt(localStorage.getItem('asaf_vocab_streak')) || 0;
+
+            if (lastDate !== today) {
+                let yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (lastDate === yesterday.toDateString()) {
+                    currentStreak++;
+                } else if (lastDate === null || lastDate !== today) {
+                    currentStreak = 1; 
+                }
+                localStorage.setItem('asaf_vocab_streak', currentStreak);
+                localStorage.setItem('asaf_vocab_last_date', today);
+            }
+            return currentStreak;
+        }
+
+        // --- אתחול מערכת וטעינת דאטא ---
+        window.onload = () => {
+            let savedTheme = localStorage.getItem('asaf_vocab_theme') || 'system';
+            document.getElementById('theme-select').value = savedTheme;
+            applyTheme(savedTheme);
+            
+            let savedSound = localStorage.getItem('asaf_vocab_autosound') || 'off';
+            document.getElementById('auto-sound-select').value = savedSound;
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if(localStorage.getItem('asaf_vocab_theme') === 'system') applyTheme('system');
+            });
+
+            // עדכון תצוגת רצף
+            let streak = updateAndGetStreak();
+            document.getElementById('dash-streak').innerText = `🔥 ${streak} ימים ברצף`;
+
+            // משיכת הנתונים מגוגל שיטס
+            fetch(url)
+                .then(res => res.text())
+                .then(text => {
+                    const jsonStr = text.substring(47).slice(0, -2);
+                    const json = JSON.parse(jsonStr);
+                    
+                    let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
+
+                    fullDB = json.table.rows.map(row => {
+                        let id = row.c[0] ? row.c[0].v : null;
+                        let saved = savedProgress[id] || { status: "new", points: 0 };
+                        
+                        return {
+                            id: id,
+                            level: row.c[1] ? Number(row.c[1].v) : 1,
+                            eng: row.c[2] ? row.c[2].v : '',
+                            heb: row.c[3] ? row.c[3].v : '',
+                            pos: row.c[4] ? row.c[4].v : '',
+                            sentence: row.c[5] ? row.c[5].v : '',
+                            hint: row.c[6] ? row.c[6].v : '',
+                            points: saved.points,
+                            status: saved.status
+                        };
+                    }).filter(w => typeof w.id === 'number');
+
+                    document.getElementById('loading-msg').innerText = "✅ מחובר בהצלחה למאגר המילים!";
+                    
+                    // רפרש לפאנל הסטטיסטיקות
+                    calculateGlobalStats();
+
+                    let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
+                    const levelsContainer = document.getElementById('levels-container');
+                    levelsContainer.innerHTML = '';
+                    const colors = ['#0077b6', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#9d4edd'];
+                    
+                    for (let i = 1; i <= 30; i++) {
+                        let btn = document.createElement('button');
+                        let color = colors[(i - 1) % colors.length];
+                        
+                        if (i <= maxUnlocked) {
+                            btn.className = 'level-btn loaded';
+                            btn.style.borderRightColor = color;
+                            btn.innerHTML = `<span style="color: ${color}">רמה ${i}</span> <span style="color: ${color}">➔</span>`;
+                            btn.onclick = () => startLevel(i, color);
+                        } else {
+                            btn.className = 'level-btn';
+                            btn.innerHTML = `<span>רמה ${i}</span> <span>🔒 נעול</span>`;
+                        }
+                        levelsContainer.appendChild(btn);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error loading words:", err);
+                    document.getElementById('loading-msg').innerText = "❌ שגיאה בחיבור לגוגל שיטס.";
+                });
+        };
+
+        function calculateGlobalStats() {
+            let total = fullDB.length;
+            let mastered = fullDB.filter(w => w.status === "mastered").length;
+            let learning = fullDB.filter(w => w.status === "learning").length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-mastered').innerText = mastered;
+            document.getElementById('stat-learning').innerText = learning;
+        }
+
+        function saveWordProgress(wordObj) {
+            let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
+            savedProgress[wordObj.id] = { status: wordObj.status, points: wordObj.points };
+            localStorage.setItem('asaf_vocab_progress', JSON.stringify(savedProgress));
+            calculateGlobalStats(); // רענון מונים מיידי
+        }
+
+        function resetAppProgress() {
+            if(confirm("⚠️ אזהרה: פעולה זו תמחק את כל ההתקדמות שלך ותנעל את השלבים בחזרה. האם אתה בטוח?")) {
+                localStorage.removeItem('asaf_vocab_progress');
+                localStorage.removeItem('asaf_vocab_level');
+                localStorage.removeItem('asaf_vocab_streak');
+                localStorage.removeItem('asaf_vocab_last_date');
+                alert("הנתונים אופסו בהצלחה. האפליקציה תתרענן כעת.");
+                location.reload();
+            }
+        }
+
+        function getWordsByStatus(status) { return currentLevelDB.filter(w => w.status === status); }
+        
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            // הגנת סרגל תחתון: מציגים רק במסכי הניווט הראשיים
+            const standardTabs = ['screen-dashboard', 'screen-review-gym', 'screen-settings'];
+            if(standardTabs.includes(screenId)) {
+                document.getElementById('bottom-nav').style.display = 'flex';
+            } else {
+                document.getElementById('bottom-nav').style.display = 'none';
+            }
+        }
+
+        function switchTab(screenId) {
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('nav-' + screenId).classList.add('active');
+            switchScreen(screenId);
+
+            if (screenId === 'screen-review-gym') {
+                initReviewGym();
+            }
+        }
+
+        function speakWord(word) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US'; utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function checkAutoSound(word) {
+            if(localStorage.getItem('asaf_vocab_autosound') === 'on') {
+                speakWord(word);
+            }
+        }
+
+        function abortSession() {
+            sessionWords = [];
+            switchTab('screen-dashboard');
+        }
+
+        // ================= התחלת רמה מהדאשבורד =================
+        function startLevel(levelNum, colorHex) {
+            document.documentElement.style.setProperty('--level-color', colorHex);
+            document.getElementById('triage-title').innerText = `מסננת מילים - רמה ${levelNum}`;
+            currentLevelDB = fullDB.filter(w => w.level === levelNum);
+            
+            if(currentLevelDB.length === 0) {
+                alert("עוד לא הזנת מילים לרמה הזו בגוגל שיטס!");
+                return;
+            }
+            manageSessionFlow();
+        }
+
+        // ================= מנהל התור החכם =================
+        function manageSessionFlow() {
+            let allLearning = getWordsByStatus("learning");
+            if (allLearning.length > 0) {
+                sessionWords = allLearning.slice(0, 10);
+                startFlashcards();
+                return;
+            }
+
+            let newWords = getWordsByStatus("new");
+            if (newWords.length > 0) {
+                switchScreen('screen-triage');
+                currentTriageIndex = 0;
+                loadTriageWord(newWords[currentTriageIndex]);
+                return;
+            }
+
+            let currentLevel = currentLevelDB[0].level;
+            let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
+            
+            if (currentLevel >= maxUnlocked && currentLevel < 30) {
+                localStorage.setItem('asaf_vocab_level', currentLevel + 1);
+                alert("🎉 אלוף! השתלטת על כל המילים. הרמה הבאה נפתחה עבורך!");
+            } else {
+                alert("כל הכבוד! סיימת לאמן את כל המילים ברמה זו.");
+            }
+            location.reload(); 
+        }
+
+        // ================= מסננת =================
+        function loadTriageWord(wordObj) {
+            currentTriageWord = wordObj;
+            document.getElementById('triage-eng').innerText = wordObj.eng;
+            document.getElementById('triage-heb').innerText = wordObj.heb;
+            
+            checkAutoSound(wordObj.eng);
+
+            let totalWords = currentLevelDB.length;
+            let masteredCount = getWordsByStatus("mastered").length;
+            let learningCount = getWordsByStatus("learning").length;
+            let progressPercent = ((masteredCount + learningCount) / totalWords) * 100;
+            document.getElementById('triage-progress').style.width = progressPercent + "%";
+
+            document.getElementById('triage-heb').style.display = 'none';
+            document.getElementById('triage-audio-btn').style.display = 'none';
+            document.getElementById('triage-actions').style.display = 'none';
+            document.getElementById('triage-tap-hint').style.display = 'block';
+        }
+
+        function revealTriageHebrew() {
+            document.getElementById('triage-heb').style.display = 'block';
+            document.getElementById('triage-audio-btn').style.display = 'block';
+            document.getElementById('triage-actions').style.display = 'flex';
+            document.getElementById('triage-tap-hint').style.display = 'none';
+        }
+
+        function handleTriage(knows) {
+            if (knows) {
+                currentTriageWord.status = "mastered";
+                currentTriageWord.points = 2;
+            } else {
+                currentTriageWord.status = "learning";
+                sessionWords.push(currentTriageWord);
+            }
+            
+            saveWordProgress(currentTriageWord);
+            currentTriageIndex++;
+            
+            let newWords = getWordsByStatus("new");
+            if (sessionWords.length >= 10 || newWords.length === 0) { 
+                if(sessionWords.length > 0) startFlashcards();
+                else manageSessionFlow();
+            } else {
+                loadTriageWord(newWords[0]); 
+            }
+        }
+
+        // ================= כרטיסיות =================
+        function startFlashcards() {
+            switchScreen('screen-flashcards');
+            currentFlashcardIndex = 0;
+            loadFlashcard(sessionWords[currentFlashcardIndex]);
+        }
+        function toggleCard() { document.getElementById('card-inner').classList.toggle('is-flipped'); }
+        function loadFlashcard(wordObj) {
+            currentFlashcardWord = wordObj;
+            document.getElementById('card-inner').classList.remove('is-flipped');
+            setTimeout(() => {
+                document.getElementById('fc-eng').innerText = wordObj.eng;
+                document.getElementById('fc-pos').innerText = wordObj.pos;
+                document.getElementById('fc-heb').innerText = wordObj.heb;
+                document.getElementById('fc-sentence').innerText = wordObj.sentence;
+                document.getElementById('fc-points-badge').innerText = `נקודות שליטה: ${wordObj.points}/2`;
+                document.getElementById('fc-progress').style.width = ((currentFlashcardIndex) / sessionWords.length) * 100 + "%";
+                checkAutoSound(wordObj.eng);
+            }, 200);
+        }
+        function nextFlashcard() {
+            currentFlashcardIndex++;
+            if (currentFlashcardIndex >= sessionWords.length) {
+                switchScreen('screen-flashcard-choice');
+            } else {
+                loadFlashcard(sessionWords[currentFlashcardIndex]);
+            }
+        }
+
+        // ================= מבחן אמריקאי =================
+        function startQuiz() {
+            switchScreen('screen-quiz');
+            currentQuizIndex = 0;
+            loadQuizQuestion(sessionWords[currentQuizIndex]);
+        }
+        function loadQuizQuestion(wordObj) {
+            currentQuizWord = wordObj;
+            usedHintInCurrentQuestion = false;
+            
+            document.getElementById('quiz-eng').innerText = wordObj.eng;
+            document.getElementById('quiz-hint').innerText = wordObj.hint;
+            document.getElementById('quiz-hint').style.display = 'none';
+            document.getElementById('btn-hint').style.display = 'inline-block';
+            document.getElementById('quiz-progress').style.width = ((currentQuizIndex) / sessionWords.length) * 100 + "%";
+
+            let allOtherHebrew = fullDB.filter(w => w.id !== wordObj.id).map(w => w.heb);
+            let distractors = allOtherHebrew.sort(() => 0.5 - Math.random()).slice(0, 3);
+            let options = [wordObj.heb, ...distractors].sort(() => 0.5 - Math.random());
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = ''; 
+            options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerText = opt;
+                btn.onclick = () => handleQuizAnswer(btn, opt === wordObj.heb);
+                optionsContainer.appendChild(btn);
+            });
+            checkAutoSound(wordObj.eng);
+        }
+        function showHint() {
+            usedHintInCurrentQuestion = true;
+            document.getElementById('quiz-hint').style.display = 'block';
+            document.getElementById('btn-hint').style.display = 'none';
+        }
+        function handleQuizAnswer(btnElement, isCorrect) {
+            let allBtns = document.querySelectorAll('.btn-option');
+            allBtns.forEach(b => b.onclick = null);
+
+            if (isCorrect) {
+                btnElement.classList.add('correct');
+                triggerHaptic('success');
+                if (!usedHintInCurrentQuestion) currentQuizWord.points += 1;
+                if (currentQuizWord.points >= 2) currentQuizWord.status = "mastered";
+            } else {
+                btnElement.classList.add('wrong');
+                triggerHaptic('error');
+                currentQuizWord.points = 0;
+                allBtns.forEach(b => { if (b.innerText === currentQuizWord.heb) b.classList.add('correct'); });
+            }
+            
+            saveWordProgress(currentQuizWord);
+
+            setTimeout(() => {
+                currentQuizIndex++;
+                if (currentQuizIndex >= sessionWords.length) {
+                    sessionWords = [];
+                    manageSessionFlow();
+                } else {
+                    loadQuizQuestion(sessionWords[currentQuizIndex]);
+                }
+            }, 1500); 
+        }
+
+        // ================= 🏋️ מנגנון חדר כושר (Active Recall חזרות) =================
+        function initReviewGym() {
+            // שולף את כל המילים במצב מאסטרד מכלל הרמות
+            let masteredWords = fullDB.filter(w => w.status === 'mastered');
+            
+            if(masteredWords.length === 0) {
+                document.getElementById('gym-active-zone').style.display = 'none';
+                document.getElementById('gym-empty-state').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('gym-active-zone').style.display = 'block';
+            document.getElementById('gym-empty-state').style.display = 'none';
+
+            // ערבוב ובחירה של עד 10 מילים לאימון
+            gymWords = masteredWords.sort(() => 0.5 - Math.random()).slice(0, 10);
+            currentGymIndex = 0;
+            loadGymWord();
+        }
+
+        function loadGymWord() {
+            gymChecked = false;
+            currentGymWord = gymWords[currentGymIndex];
+            
+            document.getElementById('gym-pos').innerText = currentGymWord.pos;
+            document.getElementById('gym-heb').innerText = currentGymWord.heb;
+            
+            // החלפת המילה המרכזית במשפט בקו תחתון חסוי (Case Insensitive)
+            let regex = new RegExp('\\b' + currentGymWord.eng + '\\b', 'gi');
+            let hiddenSentence = currentGymWord.sentence.replace(regex, '_______');
+            document.getElementById('gym-sentence').innerText = hiddenSentence;
+
+            // איפוס קלט ופידבקים
+            let inputField = document.getElementById('gym-user-input');
+            inputField.value = '';
+            inputField.className = 'gym-input';
+            inputField.disabled = false;
+            
+            let feedback = document.getElementById('gym-feedback-msg');
+            feedback.style.display = 'none';
+
+            document.getElementById('gym-btn-action').innerText = "בדוק תשובה";
+            document.getElementById('gym-progress').style.width = (currentGymIndex / gymWords.length) * 100 + "%";
+            
+            inputField.focus();
+        }
+
+        function checkGymAnswer() {
+            let inputField = document.getElementById('gym-user-input');
+            let feedback = document.getElementById('gym-feedback-msg');
+            let actionBtn = document.getElementById('gym-btn-action');
+
+            if (!gymChecked) {
+                // שלב הבדיקה
+                let userAnswer = inputField.value.trim().toLowerCase();
+                let correctAnswer = currentGymWord.eng.trim().toLowerCase();
+
+                inputField.disabled = true;
+                gymChecked = true;
+
+                if (userAnswer === correctAnswer) {
+                    inputField.classList.add('correct');
+                    feedback.innerText = "🎯 בול פגיעה! אלוף.";
+                    feedback.style.color = "var(--success)";
+                    triggerHaptic('success');
+                    checkAutoSound(currentGymWord.eng);
+                } else {
+                    inputField.classList.add('wrong');
+                    feedback.innerHTML = `❌ פספוס. התשובה הנכונה: <strong>${currentGymWord.eng}</strong>`;
+                    feedback.style.color = "var(--danger)";
+                    triggerHaptic('error');
+                    speakWord(currentGymWord.eng);
+                }
+                feedback.style.display = 'block';
+                actionBtn.innerText = "המשך למילה הבאה ➔";
+            } else {
+                // מעבר למילה הבאה
+                currentGymIndex++;
+                if(currentGymIndex >= gymWords.length) {
+                    alert("🎯 סיימת את אימון חדר הכושר! שמרת על השריר חד.");
+                    switchTab('screen-dashboard');
+                } else {
+                    loadGymWord();
+                }
+            }
+        }
+
+        // האזנה למקש אנטר בהקלדה בחדר כושר
+        document.getElementById('gym-user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkGymAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
             --bg-color: #f4f6f8; 
             --card-bg: #ffffff;
             --text-main: #2b2d42; 
