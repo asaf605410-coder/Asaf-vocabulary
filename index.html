@@ -6,140 +6,284 @@
     <title>לומדת אוצר מילים - אסף</title>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* משתני צבע תומכי מצב לילה */
         :root {
-            --level-color: #0077b6; <!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>לומדת אוצר מילים - אסף</title>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --level-color: #0077b6; 
-            --bg-color: #f4f6f8; 
+            --level-color: #0077b6;
+            --bg-color: #f4f6f8;
             --card-bg: #ffffff;
-            --text-main: #2b2d42; 
+            --text-main: #2b2d42;
             --text-secondary: #8d99ae;
-            --success: #2a9d8f; 
-            --danger: #e76f51; 
-            --warning: #f4a261;
-            --sentence-bg: #f8f9fa; 
-            --badge-bg: #e0e0e0; 
+            --success: #2a9d8f;
+            --danger: #e76f51;
+            --warning: #e6953e;
+            --sentence-bg: #f8f9fa;
+            --badge-bg: #e4e7eb;
             --quiz-hint-bg: #fff3cd;
             --btn-sec-bg: #ffffff;
-            --border-color: #e0e0e0;
+            --border-color: #e0e4e8;
             --nav-bg: #ffffff;
+            --overlay-bg: rgba(0, 0, 0, 0.55);
         }
 
         [data-theme="dark"] {
-            --bg-color: #121212; 
+            --bg-color: #121212;
             --card-bg: #1e1e1e;
-            --text-main: #f0f0f0; 
-            --text-secondary: #aaaaaa;
-            --sentence-bg: #2b2b2b; 
-            --badge-bg: #333333; 
+            --text-main: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --sentence-bg: #2a2a2a;
+            --badge-bg: #333333;
             --quiz-hint-bg: #382d10;
-            --btn-sec-bg: #2a2a2a;
-            --border-color: #444444;
+            --btn-sec-bg: #262626;
+            --border-color: #383838;
             --nav-bg: #1a1a1a;
+            --overlay-bg: rgba(0, 0, 0, 0.75);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 90px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
 
-        .screen { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.3s ease; flex-direction: column; align-items: center; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 18px 18px 95px 18px;
+            overflow-x: hidden;
+            transition: background-color 0.25s, color 0.25s;
+        }
+
+        .screen { display: none; width: 100%; max-width: 420px; animation: fadeIn 0.25s ease; flex-direction: column; align-items: center; }
         .screen.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header { text-align: center; width: 100%; margin-bottom: 20px; position: relative; }
-        .progress-bar { width: 100%; height: 8px; background-color: var(--badge-bg); border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; background-color: var(--level-color); transition: width 0.4s ease; }
+        .header { text-align: center; width: 100%; margin-bottom: 18px; position: relative; }
+        .session-top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 10px; }
+        .btn-exit {
+            background: var(--btn-sec-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-exit:active { transform: scale(0.95); }
 
-        /* כרטיסי סטטיסטיקה */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 20px; }
-        .stat-card { background: var(--card-bg); padding: 12px 5px; border-radius: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
-        .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--level-color); }
-        .stat-lbl { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
-        .streak-container { background: var(--card-bg); width: 100%; padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+        .progress-bar { width: 100%; height: 8px; background-color: var(--badge-bg); border-radius: 10px; margin-top: 12px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background-color: var(--level-color); transition: width 0.35s ease; }
 
-        .level-btn { width: 100%; background: var(--card-bg); padding: 18px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: none; font-size: 1.1rem; font-weight: 700; cursor: default; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; border-right: 6px solid #ccc; opacity: 0.5; color: var(--text-secondary); margin-bottom: 12px;}
-        .level-btn.loaded { opacity: 1; cursor: pointer; pointer-events: auto; color: var(--text-main); }
-        .level-btn.loaded:active { transform: scale(0.97); }
+        /* דאשבורד וסטטיסטיקות */
+        .streak-container {
+            background: var(--card-bg);
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+        .streak-sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
 
-        #levels-container { width: 100%; display: flex; flex-direction: column; max-height: 45vh; overflow-y: auto; padding-right: 5px; padding-bottom: 10px; }
-        #levels-container::-webkit-scrollbar { width: 5px; }
-        #levels-container::-webkit-scrollbar-thumb { background-color: var(--text-secondary); border-radius: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 14px; }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 12px 6px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+        }
+        .stat-val { font-size: 1.35rem; font-weight: 700; color: var(--level-color); }
+        .stat-lbl { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
 
-        #loading-msg { color: var(--text-secondary); margin-bottom: 15px; font-weight: 600; text-align: center;}
+        #loading-msg { color: var(--text-secondary); margin-bottom: 14px; font-weight: 600; font-size: 0.9rem; text-align: center; }
+
+        #levels-container { width: 100%; display: flex; flex-direction: column; gap: 12px; padding-bottom: 10px; }
+
+        .level-btn {
+            width: 100%;
+            background: var(--card-bg);
+            padding: 16px 18px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+            border-right: 6px solid #ccc;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: default;
+            transition: transform 0.15s, opacity 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0.5;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        .level-btn.loaded { opacity: 1; cursor: pointer; color: var(--text-main); }
+        .level-btn.loaded:active { transform: scale(0.98); }
+        .level-btn.empty-level { opacity: 0.45; cursor: default; }
+
+        .level-row-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .level-meta { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+        .level-mini-bar { width: 100%; height: 6px; background: var(--badge-bg); border-radius: 6px; overflow: hidden; }
+        .level-mini-fill { height: 100%; border-radius: 6px; transition: width 0.35s ease; }
 
         /* מסננת */
-        .triage-card { background: var(--card-bg); width: 100%; padding: 25px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; border-top: 6px solid var(--level-color); cursor: pointer; transition: 0.2s; }
-        .triage-eng { font-size: 2.5rem; font-weight: 700; direction: ltr; margin-bottom: 10px; color: var(--text-main);}
-        .triage-heb { font-size: 1.8rem; color: var(--level-color); margin-bottom: 25px; display: none; }
-        .triage-actions { display: flex; gap: 15px; width: 100%; display: none; }
-        .btn-triage { flex: 1; padding: 15px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; color: white; transition: 0.2s; }
+        .triage-card {
+            background: var(--card-bg);
+            width: 100%;
+            padding: 26px 22px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-bottom: 16px;
+            border-top: 6px solid var(--level-color);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .triage-eng { font-size: 2.4rem; font-weight: 700; direction: ltr; margin-bottom: 10px; color: var(--text-main); word-break: break-word; }
+        .triage-pos { font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+        .triage-heb { font-size: 1.8rem; font-weight: 700; color: var(--level-color); margin: 14px 0 22px 0; display: none; }
+        .triage-actions { gap: 12px; width: 100%; display: none; }
+        .btn-triage { flex: 1; padding: 15px; font-size: 1.05rem; font-weight: 600; border: none; border-radius: 14px; cursor: pointer; color: white; transition: 0.15s; }
+        .btn-triage:active { transform: scale(0.96); }
         .btn-know { background-color: var(--success); }
         .btn-dont-know { background-color: var(--danger); }
 
         /* כרטיסיות שינון */
-        .card-container { width: 100%; height: 360px; perspective: 1000px; cursor: pointer; margin-bottom: 25px; }
-        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1); box-shadow: 0 8px 25px rgba(0,0,0,0.05); border-radius: 24px; }
+        .card-container { width: 100%; height: 360px; perspective: 1000px; cursor: pointer; margin-bottom: 22px; }
+        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1); box-shadow: 0 8px 25px rgba(0,0,0,0.06); border-radius: 24px; }
         .card.is-flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--card-bg); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center; border-top: 8px solid var(--level-color); }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            text-align: center;
+            border-top: 8px solid var(--level-color);
+        }
         .card-back { transform: rotateY(180deg); }
-        .word-eng { font-size: 2.6rem; font-weight: 700; margin-bottom: 10px; direction: ltr; color: var(--text-main);}
-        .part-of-speech { font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
-        .word-heb { font-size: 2.3rem; font-weight: 700; color: var(--level-color); margin-bottom: 20px; }
-        .sentence { font-size: 1.15rem; color: var(--text-main); direction: ltr; line-height: 1.5; padding: 12px; background-color: var(--sentence-bg); border-radius: 12px; width: 100%; border-left: 4px solid var(--level-color); }
-        
+        .word-eng { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; direction: ltr; color: var(--text-main); word-break: break-word; }
+        .part-of-speech { font-size: 0.88rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+        .word-heb { font-size: 2.2rem; font-weight: 700; color: var(--level-color); margin-bottom: 18px; }
+        .sentence { font-size: 1.1rem; color: var(--text-main); direction: ltr; line-height: 1.55; padding: 12px 14px; background-color: var(--sentence-bg); border-radius: 12px; width: 100%; border-left: 4px solid var(--level-color); text-align: left; }
+
         /* מבחן אמריקאי */
-        .quiz-question { font-size: 2.3rem; font-weight: 700; direction: ltr; margin-bottom: 25px; text-align: center; color: var(--level-color); }
+        .quiz-question { font-size: 2.35rem; font-weight: 700; direction: ltr; margin: 10px 0 22px 0; text-align: center; color: var(--level-color); word-break: break-word; }
         .quiz-options { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-        .btn-option { background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); padding: 16px; border-radius: 16px; font-size: 1.15rem; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-option { background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); padding: 16px; border-radius: 16px; font-size: 1.12rem; font-weight: 600; cursor: pointer; transition: 0.15s; text-align: center; }
+        .btn-option:active { transform: scale(0.98); }
         .btn-option.correct { background-color: var(--success); color: white; border-color: var(--success); }
         .btn-option.wrong { background-color: var(--danger); color: white; border-color: var(--danger); }
-        
-        .hint-container { margin-top: 20px; width: 100%; text-align: center; }
-        .btn-hint { background: none; border: none; color: var(--warning); font-size: 1.1rem; font-weight: 600; cursor: pointer; padding: 5px; }
-        .hint-text { display: none; margin-top: 12px; font-size: 1.05rem; color: var(--text-main); background: var(--quiz-hint-bg); padding: 12px; border-radius: 10px; direction: ltr; border-left: 4px solid var(--warning); }
 
-        /* קונטרולים וסרגל ניווט תחתון */
-        .controls { display: flex; gap: 15px; width: 100%; }
-        .btn-main { flex: 1; padding: 16px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 16px; cursor: pointer; transition: 0.2s; background-color: var(--level-color); color: #ffffff; }
-        .btn-secondary { background-color: var(--btn-sec-bg); color: var(--text-main); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); flex: 1; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer;}
-        .btn-reset { background-color: var(--card-bg); color: var(--danger); border: 2px solid var(--danger); width: 100%; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .status-badge { background: var(--badge-bg); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 10px; display: inline-block; color: var(--text-main);}
-        
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.04); z-index: 100; max-width: 500px; margin: 0 auto; border-radius: 16px 16px 0 0; }
-        .nav-item { background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 20px; transition: 0.2s; }
+        .hint-container { margin-top: 18px; width: 100%; text-align: center; }
+        .btn-hint { background: none; border: none; color: var(--warning); font-size: 1.05rem; font-weight: 600; cursor: pointer; padding: 8px 12px; }
+        .hint-text { display: none; margin-top: 10px; font-size: 1.02rem; color: var(--text-main); background: var(--quiz-hint-bg); padding: 12px 14px; border-radius: 10px; direction: ltr; text-align: left; border-left: 4px solid var(--warning); }
+
+        /* כפתורים כלליים וניווט */
+        .controls { display: flex; gap: 12px; width: 100%; }
+        .btn-main { flex: 1; padding: 15px; font-size: 1.08rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; transition: 0.15s; background-color: var(--level-color); color: #ffffff; }
+        .btn-main:active { transform: scale(0.97); }
+        .btn-secondary { background-color: var(--btn-sec-bg); color: var(--text-main); box-shadow: 0 3px 10px rgba(0,0,0,0.04); border: 1px solid var(--border-color); flex: 1; padding: 15px; border-radius: 15px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: 0.15s; }
+        .btn-secondary:active { transform: scale(0.97); }
+        .btn-reset { background-color: var(--card-bg); color: var(--danger); border: 2px solid var(--danger); width: 100%; padding: 15px; border-radius: 15px; font-size: 1.05rem; font-weight: 600; cursor: pointer; }
+        .status-badge { background: var(--badge-bg); padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; color: var(--text-main); }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--nav-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 100;
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 16px 16px 0 0;
+        }
+        .nav-item { background: none; border: none; font-size: 0.92rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 20px; transition: 0.2s; }
         .nav-item.active { color: var(--level-color); transform: translateY(-2px); }
-        .nav-item-icon { font-size: 1.4rem; }
+        .nav-item-icon { font-size: 1.35rem; }
 
-        .setting-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px; background: var(--card-bg); border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);}
-        .setting-row select { padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--btn-sec-bg); color: var(--text-main); font-size: 1rem;}
+        /* הגדרות */
+        .setting-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px; background: var(--card-bg); border-radius: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); }
+        .setting-row select { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--btn-sec-bg); color: var(--text-main); font-size: 0.98rem; }
 
-        /* חדר כושר שליפה אקטיבית */
-        .gym-input-wrapper { width: 100%; position: relative; margin: 20px 0; }
-        .gym-input { width: 100%; padding: 16px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 16px; font-size: 1.3rem; text-align: center; outline: none; direction: ltr; font-weight: 600; transition: 0.2s; }
+        /* חדר כושר */
+        .gym-helpers { display: flex; gap: 10px; width: 100%; margin-bottom: 14px; }
+        .btn-helper { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+        .btn-helper:active { transform: scale(0.97); }
+        .gym-hint-pattern { display: none; direction: ltr; font-family: monospace; font-size: 1.25rem; letter-spacing: 3px; color: var(--warning); font-weight: 700; margin-top: 12px; }
+
+        .gym-input-wrapper { width: 100%; margin: 12px 0 18px 0; }
+        .gym-input { width: 100%; padding: 16px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-main); border-radius: 15px; font-size: 1.3rem; text-align: center; outline: none; direction: ltr; font-weight: 600; transition: 0.2s; }
         .gym-input:focus { border-color: var(--level-color); }
-        .gym-input.correct { border-color: var(--success); background-color: rgba(42, 157, 143, 0.1); }
-        .gym-input.wrong { border-color: var(--danger); background-color: rgba(231, 111, 81, 0.1); }
-        .gym-feedback { font-size: 1.2rem; font-weight: 700; margin-top: 10px; display: none; text-align: center; }
+        .gym-input.correct { border-color: var(--success); background-color: rgba(42, 157, 143, 0.12); }
+        .gym-input.wrong { border-color: var(--danger); background-color: rgba(231, 111, 81, 0.12); }
+        .gym-input.typo { border-color: var(--warning); background-color: rgba(244, 162, 97, 0.12); }
+        .gym-feedback { font-size: 1.05rem; font-weight: 700; margin-top: 10px; display: none; text-align: center; line-height: 1.4; }
+
+        /* מודאל הודעות נקי */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-bg);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 200;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 360px;
+            padding: 26px 22px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.2);
+            border-top: 6px solid var(--level-color);
+        }
+        .modal-icon { font-size: 2.8rem; margin-bottom: 10px; }
+        .modal-title { font-size: 1.45rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .modal-body { font-size: 1rem; color: var(--text-secondary); margin-bottom: 22px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
+    <!-- ================= 🏠 דאשבורד ראשי ================= -->
     <div id="screen-dashboard" class="screen active">
         <div class="header">
-            <h2 style="font-size: 2rem;">הלומדה של אסף</h2>
-            <p style="color: var(--text-secondary); margin-top: 3px;">מערכת למידה חכמה</p>
+            <h2 style="font-size: 1.9rem;">הלומדה של אסף</h2>
+            <p style="color: var(--text-secondary); margin-top: 2px; font-size: 0.95rem;">מערכת למידה חכמה</p>
         </div>
 
         <div class="streak-container">
-            <span style="font-size: 1.1rem; font-weight: 600;">רצף למידה יומי:</span>
-            <span style="font-size: 1.3rem; font-weight: 700;" id="dash-streak">🔥 0 ימים</span>
+            <div>
+                <div style="font-size: 1.05rem; font-weight: 600;">רצף למידה יומי</div>
+                <div class="streak-sub" id="dash-streak-sub">תרגל היום כדי לשמור על הרצף</div>
+            </div>
+            <span style="font-size: 1.25rem; font-weight: 700;" id="dash-streak">🔥 0 ימים</span>
         </div>
 
         <div class="stats-grid">
@@ -157,27 +301,38 @@
             </div>
         </div>
 
-        <div id="loading-msg">מתחבר לגוגל שיטס שלך... ⏳</div>
+        <div id="loading-msg">טוען מאגר מילים... ⏳</div>
         <div id="levels-container"></div>
     </div>
 
+    <!-- ================= 🏋️ חדר כושר חזרות (Active Recall + SRS) ================= -->
     <div id="screen-review-gym" class="screen">
         <div class="header">
             <h2>חדר כושר לחזרות</h2>
-            <p style="color: var(--text-secondary); margin-top: 3px;">שליפה אקטיבית בהקלדה למילים שאתה שולט בהן</p>
+            <p style="color: var(--text-secondary); margin-top: 2px; font-size: 0.92rem;">שליפה אקטיבית למילים שכבר למדת</p>
             <div class="progress-bar"><div class="progress-fill" id="gym-progress"></div></div>
         </div>
 
-        <div id="gym-empty-state" style="display:none; text-align:center; padding: 40px 20px;">
-            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;">חדר הכושר נעול זמנית! 🔒</p>
-            <p style="color: var(--text-secondary);">עליך להעביר לפחות מילה אחת למעמד "שולט" (Mastered) דרך השלבים הרגילים כדי להתחיל להתאמן פה.</p>
+        <div id="gym-loading-state" style="display:none; text-align:center; padding: 40px 20px;">
+            <p style="font-size: 1.15rem; font-weight: 600; color: var(--text-secondary);">טוען נתונים... ⏳</p>
         </div>
 
-        <div id="gym-active-zone" style="width: 100%;">
+        <div id="gym-empty-state" style="display:none; text-align:center; padding: 36px 20px;">
+            <p style="font-size: 1.2rem; font-weight: 700; margin-bottom: 12px;">חדר הכושר עדיין ריק 🔒</p>
+            <p style="color: var(--text-secondary); line-height: 1.5;">העבר לפחות מילה אחת למעמד "שולט" (Mastered) דרך הרמות כדי להתחיל לתרגל פה שליפה אקטיבית.</p>
+        </div>
+
+        <div id="gym-active-zone" style="width: 100%; display: none;">
             <div class="triage-card" style="cursor: default; border-top-color: var(--warning);">
                 <div class="part-of-speech" id="gym-pos">Noun</div>
-                <div class="word-heb" id="gym-heb" style="display: block; font-size: 2.4rem; margin-bottom: 15px;">מילה בעברית</div>
-                <div class="sentence" id="gym-sentence">Sentence structure goes here...</div>
+                <div class="word-heb" id="gym-heb" style="display: block; font-size: 2.2rem; margin-bottom: 14px;">מילה בעברית</div>
+                <div class="sentence" id="gym-sentence">Sentence...</div>
+                <div class="gym-hint-pattern" id="gym-hint-pattern"></div>
+            </div>
+
+            <div class="gym-helpers">
+                <button class="btn-helper" id="gym-btn-hint" onclick="revealGymLetterHint()">💡 רמז אות</button>
+                <button class="btn-helper" onclick="speakWord(currentGymWord.eng)">🔊 השמע הגייה</button>
             </div>
 
             <div class="gym-input-wrapper">
@@ -186,17 +341,18 @@
             </div>
 
             <div class="controls">
-                <button class="btn-secondary" id="gym-btn-skip" onclick="switchTab('screen-dashboard')">עצור אימון</button>
+                <button class="btn-secondary" onclick="switchTab('screen-dashboard')">עצור אימון</button>
                 <button class="btn-main" id="gym-btn-action" onclick="checkGymAnswer()">בדוק תשובה</button>
             </div>
         </div>
     </div>
 
+    <!-- ================= ⚙️ הגדרות ================= -->
     <div id="screen-settings" class="screen">
         <div class="header">
             <h2>הגדרות מערכת</h2>
         </div>
-        
+
         <div class="setting-row">
             <span>מראה ותצוגה:</span>
             <select id="theme-select" onchange="changeTheme(this.value)">
@@ -214,42 +370,58 @@
             </select>
         </div>
 
-        <div style="margin-top: 40px; width: 100%;">
+        <div class="setting-row">
+            <span>סנכרון מאגר מגוגל שיטס:</span>
+            <button class="btn-exit" onclick="syncFromGoogleSheets(true)">🔄 סנכרן עכשיו</button>
+        </div>
+
+        <div style="margin-top: 32px; width: 100%;">
             <p style="text-align: center; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem;">ניהול מאגר מקומי</p>
             <button class="btn-reset" onclick="resetAppProgress()">🗑️ איפוס כל התקדמות הלמידה</button>
         </div>
     </div>
 
+    <!-- ================= מסך מסננת ================= -->
     <div id="screen-triage" class="screen">
         <div class="header">
+            <div class="session-top-bar">
+                <button class="btn-exit" onclick="abortSession()">✕ יציאה</button>
+                <span class="status-badge" id="triage-batch-badge">נאספו לסשן: 0/10</span>
+            </div>
             <h2 id="triage-title">מסננת מילים</h2>
             <div class="progress-bar"><div class="progress-fill" id="triage-progress"></div></div>
         </div>
+
         <div class="triage-card" onclick="revealTriageHebrew()">
+            <div class="triage-pos" id="triage-pos">Noun</div>
             <div class="triage-eng" id="triage-eng">Word</div>
-            <div id="triage-tap-hint" style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 20px;">👆 הקלק על הכרטיסייה כדי לראות תרגום</div>
+            <div id="triage-tap-hint" style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 18px;">👆 הקלק על הכרטיסייה כדי לראות תרגום</div>
             <div class="triage-heb" id="triage-heb">מילה</div>
-            <button class="btn-secondary" id="triage-audio-btn" style="margin-bottom: 25px; width: 100%; display: none;" onclick="speakWord(currentTriageWord.eng); event.stopPropagation();">🔊 השמע</button>
+            <button class="btn-secondary" id="triage-audio-btn" style="margin-bottom: 18px; width: 100%; display: none;" onclick="speakWord(currentTriageWord.eng); event.stopPropagation();">🔊 השמע</button>
             <div class="triage-actions" id="triage-actions">
                 <button class="btn-triage btn-dont-know" onclick="handleTriage(false); event.stopPropagation();">❌ לא מכיר</button>
                 <button class="btn-triage btn-know" onclick="handleTriage(true); event.stopPropagation();">✅ מכיר</button>
             </div>
         </div>
-        <button class="btn-secondary" style="width:100%; margin-top: 15px;" onclick="abortSession()">חזור לתפריט</button>
     </div>
 
+    <!-- ================= מסך כרטיסיות ================= -->
     <div id="screen-flashcards" class="screen">
         <div class="header">
+            <div class="session-top-bar">
+                <button class="btn-exit" onclick="abortSession()">✕ יציאה</button>
+                <span class="status-badge" id="fc-points-badge">נקודות שליטה: 0/2</span>
+            </div>
             <h2>זמן שינון</h2>
-            <div class="status-badge" id="fc-points-badge">נקודות שליטה: 0/2</div>
             <div class="progress-bar"><div class="progress-fill" id="fc-progress"></div></div>
         </div>
+
         <div class="card-container" id="flashcard" onclick="toggleCard()">
             <div class="card" id="card-inner">
                 <div class="card-face card-front">
                     <div class="part-of-speech" id="fc-pos">Noun</div>
                     <div class="word-eng" id="fc-eng">Word</div>
-                    <div style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 30px;">הקלק כדי להפוך</div>
+                    <div style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 26px;">👆 הקלק כדי להפוך</div>
                 </div>
                 <div class="card-face card-back">
                     <div class="word-heb" id="fc-heb">מילה</div>
@@ -257,34 +429,46 @@
                 </div>
             </div>
         </div>
+
         <div class="controls">
             <button class="btn-secondary" onclick="speakWord(currentFlashcardWord.eng)">🔊 השמע</button>
             <button class="btn-main" onclick="nextFlashcard()">הבא ➔</button>
         </div>
     </div>
 
+    <!-- ================= מסך בחירה אחרי כרטיסיות ================= -->
     <div id="screen-flashcard-choice" class="screen">
         <div class="header">
-            <h2 style="font-size: 2.2rem; color: var(--level-color);">סיימת לשנן!</h2>
-            <p style="margin-top: 10px; font-size: 1.1rem;">מה עושים עכשיו?</p>
+            <div class="session-top-bar">
+                <button class="btn-exit" onclick="abortSession()">✕ יציאה</button>
+                <span></span>
+            </div>
+            <h2 style="font-size: 2rem; color: var(--level-color); margin-top: 15px;">סיימת לשנן!</h2>
+            <p style="margin-top: 8px; font-size: 1.05rem; color: var(--text-secondary);">מוכן לבדוק מה נתפס?</p>
         </div>
-        <button class="btn-secondary" style="width:100%; margin-bottom: 20px;" onclick="startFlashcards()">🔄 חזור שוב על הכרטיסיות</button>
-        <button class="btn-main" style="width:100%; font-size: 1.3rem;" onclick="startQuiz()">📝 יאללה למבחן</button>
+        <button class="btn-secondary" style="width:100%; margin-bottom: 14px;" onclick="startFlashcards()">🔄 חזור שוב על הכרטיסיות</button>
+        <button class="btn-main" style="width:100%; font-size: 1.2rem;" onclick="startQuiz()">📝 יאללה למבחן</button>
     </div>
 
+    <!-- ================= מסך מבחן אמריקאי ================= -->
     <div id="screen-quiz" class="screen">
         <div class="header">
+            <div class="session-top-bar">
+                <button class="btn-exit" onclick="abortSession()">✕ יציאה</button>
+                <span class="status-badge" id="quiz-counter-badge">שאלה 1/10</span>
+            </div>
             <h2>מיני-מבחן</h2>
             <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
         </div>
         <div class="quiz-question" id="quiz-eng">Word</div>
         <div class="quiz-options" id="quiz-options"></div>
-        <div class="hint-container">
-            <button class="btn-hint" id="btn-hint" onclick="showHint()">💡 לחץ לרמז משפט</button>
+        <div class="hint-container" id="quiz-hint-container">
+            <button class="btn-hint" id="btn-hint" onclick="showHint()">💡 לחץ לרמז משפט (ללא נקודת שליטה)</button>
             <div class="hint-text" id="quiz-hint">Hint</div>
         </div>
     </div>
 
+    <!-- ================= 📱 סרגל ניווט תחתון ================= -->
     <div class="bottom-nav" id="bottom-nav">
         <button class="nav-item active" id="nav-screen-dashboard" onclick="switchTab('screen-dashboard')">
             <span class="nav-item-icon">🏠</span><span>בית</span>
@@ -297,19 +481,108 @@
         </button>
     </div>
 
+    <!-- ================= מודאל התראות וניצחון ================= -->
+    <div class="modal-overlay" id="app-modal">
+        <div class="modal-box">
+            <div class="modal-icon" id="modal-icon">🎉</div>
+            <div class="modal-title" id="modal-title">כל הכבוד!</div>
+            <div class="modal-body" id="modal-body"></div>
+            <button class="btn-main" style="width: 100%;" onclick="closeModal()">המשך</button>
+        </div>
+    </div>
+
     <script>
-        const sheetId = '1YYCJ8-g4v2tK9hLLK4U64MyT3PPDeZR6C9IEAwOKYDc';
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+        const SHEET_ID = '1YYCJ8-g4v2tK9hLLK4U64MyT3PPDeZR6C9IEAwOKYDc';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        const LEVEL_COLORS = ['#0077b6', '#2a9d8f', '#d4a017', '#f4a261', '#e76f51', '#9d4edd'];
 
-        let fullDB = [], currentLevelDB = [], sessionWords = []; 
-        let currentTriageIndex = 0, currentFlashcardIndex = 0, currentQuizIndex = 0;
+        let fullDB = [];
+        let currentLevelDB = [];
+        let currentLevelNum = 1;
+        let sessionWords = [];
+        let isDataLoaded = false;
+
+        let currentFlashcardIndex = 0;
+        let currentQuizIndex = 0;
         let usedHintInCurrentQuestion = false;
-        let currentTriageWord, currentFlashcardWord, currentQuizWord;
+        let currentTriageWord = null;
+        let currentFlashcardWord = null;
+        let currentQuizWord = null;
 
-        // משתני חדר כושר
-        let gymWords = [], currentGymIndex = 0, currentGymWord = null, gymChecked = false;
+        // טיימרים לניקוי בטוח ביציאה
+        let flashcardTimer = null;
+        let quizTimer = null;
 
-        // --- ניהול מראה ועיצוב ---
+        // חדר כושר
+        let gymWords = [];
+        let currentGymIndex = 0;
+        let currentGymWord = null;
+        let gymChecked = false;
+        let gymTypoRetryUsed = false;
+        let gymHintLetters = 0;
+        let modalCallback = null;
+
+        // --- כלי עזר ---
+        function shuffle(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function levenshtein(a, b) {
+            const m = a.length, n = b.length;
+            const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+            for (let i = 0; i <= m; i++) dp[i][0] = i;
+            for (let j = 0; j <= n; j++) dp[0][j] = j;
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+                }
+            }
+            return dp[m][n];
+        }
+
+        function maskWordInSentence(sentence, word) {
+            if (!sentence || !word) return sentence || '';
+            const cleanWord = word.trim();
+            const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+            // 1. התאמה מדויקת
+            const exactRe = new RegExp(`\\b${esc(cleanWord)}\\b`, 'gi');
+            if (exactRe.test(sentence)) return sentence.replace(exactRe, '_______');
+
+            // 2. התאמה להטיות (רבים, זמנים וכו')
+            if (cleanWord.length >= 4) {
+                let stem = cleanWord;
+                if (/[ey]$/i.test(stem) && stem.length >= 5) stem = stem.slice(0, -1);
+                const stemRe = new RegExp(`\\b${esc(stem)}[a-z]*\\b`, 'gi');
+                if (stemRe.test(sentence)) return sentence.replace(stemRe, '_______');
+            }
+            return sentence;
+        }
+
+        function showModal(icon, title, body, onClose = null) {
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerText = body;
+            modalCallback = onClose;
+            document.getElementById('app-modal').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('app-modal').classList.remove('open');
+            if (modalCallback) {
+                const cb = modalCallback;
+                modalCallback = null;
+                cb();
+            }
+        }
+
+        // --- מראה, אודיו ורטט ---
         function applyTheme(theme) {
             if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.setAttribute('data-theme', 'dark');
@@ -317,244 +590,351 @@
                 document.documentElement.setAttribute('data-theme', 'light');
             }
         }
+
         function changeTheme(theme) {
             localStorage.setItem('asaf_vocab_theme', theme);
             applyTheme(theme);
         }
 
-        // --- פידבק תחושתי (Haptic) ---
         function triggerHaptic(type) {
-            if (navigator.vibrate) {
-                if (type === 'success') navigator.vibrate(40);
-                if (type === 'error') navigator.vibrate([60, 50, 60]);
-            }
-        }
-
-        // --- ניהול רצף למידה יומי (Streak) ---
-        function updateAndGetStreak() {
-            let today = new Date().toDateString();
-            let lastDate = localStorage.getItem('asaf_vocab_last_date');
-            let currentStreak = parseInt(localStorage.getItem('asaf_vocab_streak')) || 0;
-
-            if (lastDate !== today) {
-                let yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                if (lastDate === yesterday.toDateString()) {
-                    currentStreak++;
-                } else if (lastDate === null || lastDate !== today) {
-                    currentStreak = 1; 
-                }
-                localStorage.setItem('asaf_vocab_streak', currentStreak);
-                localStorage.setItem('asaf_vocab_last_date', today);
-            }
-            return currentStreak;
-        }
-
-        // --- אתחול מערכת וטעינת דאטא ---
-        window.onload = () => {
-            let savedTheme = localStorage.getItem('asaf_vocab_theme') || 'system';
-            document.getElementById('theme-select').value = savedTheme;
-            applyTheme(savedTheme);
-            
-            let savedSound = localStorage.getItem('asaf_vocab_autosound') || 'off';
-            document.getElementById('auto-sound-select').value = savedSound;
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if(localStorage.getItem('asaf_vocab_theme') === 'system') applyTheme('system');
-            });
-
-            // עדכון תצוגת רצף
-            let streak = updateAndGetStreak();
-            document.getElementById('dash-streak').innerText = `🔥 ${streak} ימים ברצף`;
-
-            // משיכת הנתונים מגוגל שיטס
-            fetch(url)
-                .then(res => res.text())
-                .then(text => {
-                    const jsonStr = text.substring(47).slice(0, -2);
-                    const json = JSON.parse(jsonStr);
-                    
-                    let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
-
-                    fullDB = json.table.rows.map(row => {
-                        let id = row.c[0] ? row.c[0].v : null;
-                        let saved = savedProgress[id] || { status: "new", points: 0 };
-                        
-                        return {
-                            id: id,
-                            level: row.c[1] ? Number(row.c[1].v) : 1,
-                            eng: row.c[2] ? row.c[2].v : '',
-                            heb: row.c[3] ? row.c[3].v : '',
-                            pos: row.c[4] ? row.c[4].v : '',
-                            sentence: row.c[5] ? row.c[5].v : '',
-                            hint: row.c[6] ? row.c[6].v : '',
-                            points: saved.points,
-                            status: saved.status
-                        };
-                    }).filter(w => typeof w.id === 'number');
-
-                    document.getElementById('loading-msg').innerText = "✅ מחובר בהצלחה למאגר המילים!";
-                    
-                    // רפרש לפאנל הסטטיסטיקות
-                    calculateGlobalStats();
-
-                    let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
-                    const levelsContainer = document.getElementById('levels-container');
-                    levelsContainer.innerHTML = '';
-                    const colors = ['#0077b6', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#9d4edd'];
-                    
-                    for (let i = 1; i <= 30; i++) {
-                        let btn = document.createElement('button');
-                        let color = colors[(i - 1) % colors.length];
-                        
-                        if (i <= maxUnlocked) {
-                            btn.className = 'level-btn loaded';
-                            btn.style.borderRightColor = color;
-                            btn.innerHTML = `<span style="color: ${color}">רמה ${i}</span> <span style="color: ${color}">➔</span>`;
-                            btn.onclick = () => startLevel(i, color);
-                        } else {
-                            btn.className = 'level-btn';
-                            btn.innerHTML = `<span>רמה ${i}</span> <span>🔒 נעול</span>`;
-                        }
-                        levelsContainer.appendChild(btn);
-                    }
-                })
-                .catch(err => {
-                    console.error("Error loading words:", err);
-                    document.getElementById('loading-msg').innerText = "❌ שגיאה בחיבור לגוגל שיטס.";
-                });
-        };
-
-        function calculateGlobalStats() {
-            let total = fullDB.length;
-            let mastered = fullDB.filter(w => w.status === "mastered").length;
-            let learning = fullDB.filter(w => w.status === "learning").length;
-
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-mastered').innerText = mastered;
-            document.getElementById('stat-learning').innerText = learning;
-        }
-
-        function saveWordProgress(wordObj) {
-            let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
-            savedProgress[wordObj.id] = { status: wordObj.status, points: wordObj.points };
-            localStorage.setItem('asaf_vocab_progress', JSON.stringify(savedProgress));
-            calculateGlobalStats(); // רענון מונים מיידי
-        }
-
-        function resetAppProgress() {
-            if(confirm("⚠️ אזהרה: פעולה זו תמחק את כל ההתקדמות שלך ותנעל את השלבים בחזרה. האם אתה בטוח?")) {
-                localStorage.removeItem('asaf_vocab_progress');
-                localStorage.removeItem('asaf_vocab_level');
-                localStorage.removeItem('asaf_vocab_streak');
-                localStorage.removeItem('asaf_vocab_last_date');
-                alert("הנתונים אופסו בהצלחה. האפליקציה תתרענן כעת.");
-                location.reload();
-            }
-        }
-
-        function getWordsByStatus(status) { return currentLevelDB.filter(w => w.status === status); }
-        
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            // הגנת סרגל תחתון: מציגים רק במסכי הניווט הראשיים
-            const standardTabs = ['screen-dashboard', 'screen-review-gym', 'screen-settings'];
-            if(standardTabs.includes(screenId)) {
-                document.getElementById('bottom-nav').style.display = 'flex';
-            } else {
-                document.getElementById('bottom-nav').style.display = 'none';
-            }
-        }
-
-        function switchTab(screenId) {
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('nav-' + screenId).classList.add('active');
-            switchScreen(screenId);
-
-            if (screenId === 'screen-review-gym') {
-                initReviewGym();
-            }
+            if (!navigator.vibrate) return;
+            if (type === 'success') navigator.vibrate(35);
+            else if (type === 'error') navigator.vibrate([55, 45, 55]);
+            else if (type === 'warning') navigator.vibrate(25);
         }
 
         function speakWord(word) {
+            if (!word || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = 'en-US'; utterance.rate = 0.9;
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
             window.speechSynthesis.speak(utterance);
         }
 
         function checkAutoSound(word) {
-            if(localStorage.getItem('asaf_vocab_autosound') === 'on') {
+            if (localStorage.getItem('asaf_vocab_autosound') === 'on') {
                 speakWord(word);
             }
         }
 
+        // --- רצף למידה יומי אמיתי ---
+        function renderStreakDisplay() {
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            const lastDate = localStorage.getItem('asaf_vocab_last_date');
+            const savedStreak = parseInt(localStorage.getItem('asaf_vocab_streak')) || 0;
+
+            let displayCount = 0;
+            let subText = 'תרגל היום כדי להתחיל רצף חדש';
+
+            if (lastDate === today) {
+                displayCount = savedStreak;
+                subText = 'כל הכבוד! השלמת את היעד להיום ✅';
+            } else if (lastDate === yesterday) {
+                displayCount = savedStreak;
+                subText = 'תרגל היום כדי לשמור על הרצף!';
+            }
+
+            document.getElementById('dash-streak').innerText = `🔥 ${displayCount} ימים`;
+            document.getElementById('dash-streak-sub').innerText = subText;
+        }
+
+        function recordDailyActivity() {
+            const today = new Date().toDateString();
+            const lastDate = localStorage.getItem('asaf_vocab_last_date');
+            if (lastDate === today) return;
+
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            let currentStreak = parseInt(localStorage.getItem('asaf_vocab_streak')) || 0;
+            currentStreak = (lastDate === yesterday) ? currentStreak + 1 : 1;
+
+            localStorage.setItem('asaf_vocab_streak', currentStreak);
+            localStorage.setItem('asaf_vocab_last_date', today);
+            renderStreakDisplay();
+        }
+
+        // --- טעינת נתונים + תמיכה מלאה באופליין ---
+        function hydrateDB(rawWords) {
+            const savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
+            fullDB = rawWords.map(w => {
+                const saved = savedProgress[w.id] || {};
+                return {
+                    ...w,
+                    points: typeof saved.points === 'number' ? saved.points : 0,
+                    status: saved.status || 'new',
+                    lastReviewed: saved.lastReviewed || 0
+                };
+            });
+            isDataLoaded = true;
+            renderDashboard();
+
+            // אם המשתמש כבר ממתין במסך חדר הכושר, מפעילים מיד
+            if (document.getElementById('screen-review-gym').classList.contains('active') &&
+                document.getElementById('gym-active-zone').style.display === 'none') {
+                initReviewGym();
+            }
+        }
+
+        function parseGoogleSheetResponse(text) {
+            const start = text.indexOf('{');
+            const end = text.lastIndexOf('}');
+            if (start === -1 || end === -1) throw new Error('Invalid JSON envelope');
+            const json = JSON.parse(text.slice(start, end + 1));
+
+            return json.table.rows.map(row => {
+                const rawId = row.c && row.c[0] ? Number(row.c[0].v) : NaN;
+                const level = row.c && row.c[1] ? Number(row.c[1].v) : 1;
+                const eng = row.c && row.c[2] && row.c[2].v != null ? String(row.c[2].v).trim() : '';
+                const heb = row.c && row.c[3] && row.c[3].v != null ? String(row.c[3].v).trim() : '';
+                const pos = row.c && row.c[4] && row.c[4].v != null ? String(row.c[4].v).trim() : '';
+                const sentence = row.c && row.c[5] && row.c[5].v != null ? String(row.c[5].v).trim() : '';
+                const hint = row.c && row.c[6] && row.c[6].v != null ? String(row.c[6].v).trim() : '';
+                return { id: rawId, level: isNaN(level) ? 1 : level, eng, heb, pos, sentence, hint };
+            }).filter(w => !isNaN(w.id) && w.id > 0 && w.eng.length > 0 && w.heb.length > 0);
+        }
+
+        function syncFromGoogleSheets(manual = false) {
+            const msgEl = document.getElementById('loading-msg');
+            if (manual) msgEl.innerText = 'מסנכרן מול גוגל שיטס... ⏳';
+
+            fetch(SHEET_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error('Network response error');
+                    return res.text();
+                })
+                .then(text => {
+                    const rawWords = parseGoogleSheetResponse(text);
+                    localStorage.setItem('asaf_vocab_words_cache', JSON.stringify(rawWords));
+                    hydrateDB(rawWords);
+                    msgEl.innerText = '✅ מסונכרן עם גוגל שיטס (זמין גם באופליין)';
+                    if (manual) showModal('✅', 'הסנכרון הושלם', `נטענו ${rawWords.length} מילים מהגיליון ונשמרו לשימוש גם ללא אינטרנט.`);
+                })
+                .catch(err => {
+                    console.error('Sync error:', err);
+                    if (isDataLoaded) {
+                        msgEl.innerText = '📴 מצב אופליין – עובד מהמאגר השמור במכשיר';
+                        if (manual) showModal('📴', 'אין חיבור לרשת', 'לא ניתן להתחבר כרגע לגוגל שיטס. המערכת ממשיכה לעבוד מהמאגר המקומי.');
+                    } else {
+                        msgEl.innerText = '❌ שגיאה בחיבור לגוגל שיטס ואין מאגר שמור עדיין.';
+                    }
+                });
+        }
+
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('asaf_vocab_theme') || 'system';
+            document.getElementById('theme-select').value = savedTheme;
+            applyTheme(savedTheme);
+
+            const savedSound = localStorage.getItem('asaf_vocab_autosound') || 'off';
+            document.getElementById('auto-sound-select').value = savedSound;
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if ((localStorage.getItem('asaf_vocab_theme') || 'system') === 'system') applyTheme('system');
+            });
+
+            renderStreakDisplay();
+
+            // טעינה מיידית מה-Cache (אופליין)
+            const cachedRaw = localStorage.getItem('asaf_vocab_words_cache');
+            if (cachedRaw) {
+                try {
+                    const parsed = JSON.parse(cachedRaw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        hydrateDB(parsed);
+                        document.getElementById('loading-msg').innerText = '⚡ נטען מהמכשיר, בודק עדכונים...';
+                    }
+                } catch (e) { /* מתעלם מקאש פגום */ }
+            }
+
+            // משיכה ברקע לעדכון מהענן
+            syncFromGoogleSheets(false);
+        };
+
+        // --- רינדור דאשבורד ורמות ---
+        function renderDashboard() {
+            calculateGlobalStats();
+            const maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
+            const maxLevelInDB = fullDB.reduce((max, w) => Math.max(max, w.level), 30);
+            const totalLevels = Math.max(30, maxLevelInDB);
+
+            const container = document.getElementById('levels-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= totalLevels; i++) {
+                const levelWords = fullDB.filter(w => w.level === i);
+                const masteredCount = levelWords.filter(w => w.status === 'mastered').length;
+                const totalCount = levelWords.length;
+                const pct = totalCount > 0 ? Math.round((masteredCount / totalCount) * 100) : 0;
+                const color = LEVEL_COLORS[(i - 1) % LEVEL_COLORS.length];
+
+                const btn = document.createElement('button');
+                const isUnlocked = i <= maxUnlocked;
+
+                if (isUnlocked && totalCount > 0) {
+                    btn.className = 'level-btn loaded';
+                    btn.style.borderRightColor = color;
+                    btn.innerHTML = `
+                        <div class="level-row-top">
+                            <span style="color: ${color}">רמה ${i} ${masteredCount === totalCount ? '🏆' : ''}</span>
+                            <span class="level-meta">${masteredCount}/${totalCount} מילים (${pct}%)</span>
+                        </div>
+                        <div class="level-mini-bar">
+                            <div class="level-mini-fill" style="width: ${pct}%; background-color: ${color};"></div>
+                        </div>
+                    `;
+                    btn.onclick = () => startLevel(i, color);
+                } else if (isUnlocked && totalCount === 0) {
+                    btn.className = 'level-btn empty-level';
+                    btn.innerHTML = `
+                        <div class="level-row-top">
+                            <span>רמה ${i}</span>
+                            <span class="level-meta">עדיין ללא מילים בגיליון</span>
+                        </div>
+                    `;
+                } else {
+                    btn.className = 'level-btn';
+                    btn.innerHTML = `
+                        <div class="level-row-top">
+                            <span>רמה ${i}</span>
+                            <span class="level-meta">${totalCount > 0 ? `${totalCount} מילים • ` : ''}🔒 נעול</span>
+                        </div>
+                    `;
+                }
+                container.appendChild(btn);
+            }
+        }
+
+        function calculateGlobalStats() {
+            document.getElementById('stat-total').innerText = fullDB.length;
+            document.getElementById('stat-mastered').innerText = fullDB.filter(w => w.status === 'mastered').length;
+            document.getElementById('stat-learning').innerText = fullDB.filter(w => w.status === 'learning').length;
+        }
+
+        function saveWordProgress(wordObj) {
+            const savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
+            savedProgress[wordObj.id] = {
+                status: wordObj.status,
+                points: wordObj.points,
+                lastReviewed: wordObj.lastReviewed || 0
+            };
+            localStorage.setItem('asaf_vocab_progress', JSON.stringify(savedProgress));
+            calculateGlobalStats();
+        }
+
+        function resetAppProgress() {
+            if (confirm('⚠️ אזהרה: פעולה זו תמחק את כל ההתקדמות שלך ותנעל את השלבים בחזרה. האם אתה בטוח?')) {
+                localStorage.removeItem('asaf_vocab_progress');
+                localStorage.removeItem('asaf_vocab_level');
+                localStorage.removeItem('asaf_vocab_streak');
+                localStorage.removeItem('asaf_vocab_last_date');
+                fullDB.forEach(w => { w.status = 'new'; w.points = 0; w.lastReviewed = 0; });
+                renderStreakDisplay();
+                renderDashboard();
+                showModal('🗑️', 'הנתונים אופסו', 'כל ההתקדמות נוקתה בהצלחה. בהצלחה בסבב החדש!');
+            }
+        }
+
+        // --- ניווט ---
+        function clearActiveTimers() {
+            if (flashcardTimer) { clearTimeout(flashcardTimer); flashcardTimer = null; }
+            if (quizTimer) { clearTimeout(quizTimer); quizTimer = null; }
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            const standardTabs = ['screen-dashboard', 'screen-review-gym', 'screen-settings'];
+            document.getElementById('bottom-nav').style.display = standardTabs.includes(screenId) ? 'flex' : 'none';
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        function switchTab(screenId) {
+            clearActiveTimers();
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('nav-' + screenId).classList.add('active');
+            switchScreen(screenId);
+
+            if (screenId === 'screen-dashboard') renderDashboard();
+            if (screenId === 'screen-review-gym') initReviewGym();
+        }
+
         function abortSession() {
+            clearActiveTimers();
             sessionWords = [];
             switchTab('screen-dashboard');
         }
 
-        // ================= התחלת רמה מהדאשבורד =================
+        function getWordsByStatus(status) {
+            return currentLevelDB.filter(w => w.status === status);
+        }
+
+        // ================= ניהול סשן ורמות =================
         function startLevel(levelNum, colorHex) {
+            currentLevelNum = levelNum;
             document.documentElement.style.setProperty('--level-color', colorHex);
             document.getElementById('triage-title').innerText = `מסננת מילים - רמה ${levelNum}`;
             currentLevelDB = fullDB.filter(w => w.level === levelNum);
-            
-            if(currentLevelDB.length === 0) {
-                alert("עוד לא הזנת מילים לרמה הזו בגוגל שיטס!");
-                return;
-            }
+            sessionWords = [];
             manageSessionFlow();
         }
 
-        // ================= מנהל התור החכם =================
         function manageSessionFlow() {
-            let allLearning = getWordsByStatus("learning");
-            if (allLearning.length > 0) {
+            const allLearning = getWordsByStatus('learning');
+            const newWords = getWordsByStatus('new');
+
+            // אם יש 10 מילים בלמידה, או שאין יותר מילים חדשות להשלים איתן -> עוברים לכרטיסיות
+            if (allLearning.length >= 10 || (allLearning.length > 0 && newWords.length === 0)) {
                 sessionWords = allLearning.slice(0, 10);
                 startFlashcards();
                 return;
             }
 
-            let newWords = getWordsByStatus("new");
+            // אם יש מילים חדשות -> משלימים עד 10 מילים יחד עם מילים שנשארו בלמידה (מונע לופ של מילה אחת)
             if (newWords.length > 0) {
+                sessionWords = [...allLearning];
                 switchScreen('screen-triage');
-                currentTriageIndex = 0;
-                loadTriageWord(newWords[currentTriageIndex]);
+                loadTriageWord(newWords[0]);
                 return;
             }
 
-            let currentLevel = currentLevelDB[0].level;
-            let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
-            
-            if (currentLevel >= maxUnlocked && currentLevel < 30) {
-                localStorage.setItem('asaf_vocab_level', currentLevel + 1);
-                alert("🎉 אלוף! השתלטת על כל המילים. הרמה הבאה נפתחה עבורך!");
-            } else {
-                alert("כל הכבוד! סיימת לאמן את כל המילים ברמה זו.");
-            }
-            location.reload(); 
+            // כל המילים ברמה הן mastered
+            handleLevelComplete();
         }
 
-        // ================= מסננת =================
+        function handleLevelComplete() {
+            const maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
+            let msg = `סיימת לשלוט בכל המילים ברמה ${currentLevelNum}! תוכל לחזור עליהן בכל עת דרך חדר הכושר.`;
+
+            if (currentLevelNum >= maxUnlocked && currentLevelNum < 30) {
+                localStorage.setItem('asaf_vocab_level', currentLevelNum + 1);
+                msg = `השתלטת על כל המילים ברמה ${currentLevelNum}. רמה ${currentLevelNum + 1} נפתחה עבורך!`;
+            }
+
+            triggerHaptic('success');
+            renderDashboard();
+            showModal('🏆', 'אלוף! הרמה הושלמה', msg, () => switchTab('screen-dashboard'));
+        }
+
+        // ================= מסננת (Triage) =================
         function loadTriageWord(wordObj) {
             currentTriageWord = wordObj;
+            document.getElementById('triage-pos').innerText = wordObj.pos || '';
             document.getElementById('triage-eng').innerText = wordObj.eng;
             document.getElementById('triage-heb').innerText = wordObj.heb;
-            
-            checkAutoSound(wordObj.eng);
+            document.getElementById('triage-batch-badge').innerText = `נאספו לסשן: ${sessionWords.length}/10`;
 
-            let totalWords = currentLevelDB.length;
-            let masteredCount = getWordsByStatus("mastered").length;
-            let learningCount = getWordsByStatus("learning").length;
-            let progressPercent = ((masteredCount + learningCount) / totalWords) * 100;
-            document.getElementById('triage-progress').style.width = progressPercent + "%";
+            const totalWords = currentLevelDB.length;
+            const processedCount = getWordsByStatus('mastered').length + getWordsByStatus('learning').length;
+            document.getElementById('triage-progress').style.width = `${(processedCount / totalWords) * 100}%`;
 
             document.getElementById('triage-heb').style.display = 'none';
             document.getElementById('triage-audio-btn').style.display = 'none';
             document.getElementById('triage-actions').style.display = 'none';
             document.getElementById('triage-tap-hint').style.display = 'block';
+
+            checkAutoSound(wordObj.eng);
         }
 
         function revealTriageHebrew() {
@@ -565,49 +945,70 @@
         }
 
         function handleTriage(knows) {
+            recordDailyActivity();
             if (knows) {
-                currentTriageWord.status = "mastered";
+                currentTriageWord.status = 'mastered';
                 currentTriageWord.points = 2;
+                currentTriageWord.lastReviewed = Date.now();
+                triggerHaptic('success');
             } else {
-                currentTriageWord.status = "learning";
+                currentTriageWord.status = 'learning';
                 sessionWords.push(currentTriageWord);
             }
-            
+
             saveWordProgress(currentTriageWord);
-            currentTriageIndex++;
-            
-            let newWords = getWordsByStatus("new");
-            if (sessionWords.length >= 10 || newWords.length === 0) { 
-                if(sessionWords.length > 0) startFlashcards();
+
+            const newWords = getWordsByStatus('new');
+            if (sessionWords.length >= 10 || newWords.length === 0) {
+                if (sessionWords.length > 0) startFlashcards();
                 else manageSessionFlow();
             } else {
-                loadTriageWord(newWords[0]); 
+                loadTriageWord(newWords[0]);
             }
         }
 
-        // ================= כרטיסיות =================
+        // ================= כרטיסיות שינון =================
         function startFlashcards() {
+            clearActiveTimers();
             switchScreen('screen-flashcards');
             currentFlashcardIndex = 0;
-            loadFlashcard(sessionWords[currentFlashcardIndex]);
+            loadFlashcard(sessionWords[currentFlashcardIndex], true);
         }
-        function toggleCard() { document.getElementById('card-inner').classList.toggle('is-flipped'); }
-        function loadFlashcard(wordObj) {
+
+        function toggleCard() {
+            document.getElementById('card-inner').classList.toggle('is-flipped');
+        }
+
+        function loadFlashcard(wordObj, instant = false) {
+            clearActiveTimers();
             currentFlashcardWord = wordObj;
-            document.getElementById('card-inner').classList.remove('is-flipped');
-            setTimeout(() => {
+            const cardInner = document.getElementById('card-inner');
+            const wasFlipped = cardInner.classList.contains('is-flipped');
+            cardInner.classList.remove('is-flipped');
+
+            const applyContent = () => {
                 document.getElementById('fc-eng').innerText = wordObj.eng;
-                document.getElementById('fc-pos').innerText = wordObj.pos;
+                document.getElementById('fc-pos').innerText = wordObj.pos || '';
                 document.getElementById('fc-heb').innerText = wordObj.heb;
-                document.getElementById('fc-sentence').innerText = wordObj.sentence;
+                document.getElementById('fc-sentence').innerText = wordObj.sentence || '';
+                document.getElementById('fc-sentence').style.display = wordObj.sentence ? 'block' : 'none';
                 document.getElementById('fc-points-badge').innerText = `נקודות שליטה: ${wordObj.points}/2`;
-                document.getElementById('fc-progress').style.width = ((currentFlashcardIndex) / sessionWords.length) * 100 + "%";
+                document.getElementById('fc-progress').style.width = `${(currentFlashcardIndex / sessionWords.length) * 100}%`;
                 checkAutoSound(wordObj.eng);
-            }, 200);
+            };
+
+            // מחכים שהכרטיסייה תעבור את קו ה-90 מעלות לפני החלפת הטקסט (אפס ספוילרים)
+            if (wasFlipped && !instant) {
+                flashcardTimer = setTimeout(applyContent, 240);
+            } else {
+                applyContent();
+            }
         }
+
         function nextFlashcard() {
             currentFlashcardIndex++;
             if (currentFlashcardIndex >= sessionWords.length) {
+                clearActiveTimers();
                 switchScreen('screen-flashcard-choice');
             } else {
                 loadFlashcard(sessionWords[currentFlashcardIndex]);
@@ -616,59 +1017,100 @@
 
         // ================= מבחן אמריקאי =================
         function startQuiz() {
+            clearActiveTimers();
+            sessionWords = shuffle(sessionWords);
             switchScreen('screen-quiz');
             currentQuizIndex = 0;
             loadQuizQuestion(sessionWords[currentQuizIndex]);
         }
+
+        function buildQuizOptions(wordObj) {
+            const correctHeb = wordObj.heb.trim();
+            const targetPos = (wordObj.pos || '').toLowerCase();
+
+            const samePosUnique = new Set();
+            const otherPosUnique = new Set();
+
+            for (const w of fullDB) {
+                const h = w.heb.trim();
+                if (!h || h === correctHeb) continue;
+                if (targetPos && (w.pos || '').toLowerCase() === targetPos) {
+                    samePosUnique.add(h);
+                } else {
+                    otherPosUnique.add(h);
+                }
+            }
+
+            // עדיפות למסיחים מאותו חלק דיבר, השלמה משאר המאגר במידת הצורך
+            let distractors = shuffle([...samePosUnique]).slice(0, 3);
+            if (distractors.length < 3) {
+                const extras = shuffle([...otherPosUnique]).filter(h => !distractors.includes(h));
+                distractors = [...distractors, ...extras.slice(0, 3 - distractors.length)];
+            }
+
+            return shuffle([correctHeb, ...distractors]);
+        }
+
         function loadQuizQuestion(wordObj) {
             currentQuizWord = wordObj;
             usedHintInCurrentQuestion = false;
-            
+
             document.getElementById('quiz-eng').innerText = wordObj.eng;
-            document.getElementById('quiz-hint').innerText = wordObj.hint;
+            document.getElementById('quiz-counter-badge').innerText = `שאלה ${currentQuizIndex + 1}/${sessionWords.length}`;
+            document.getElementById('quiz-progress').style.width = `${(currentQuizIndex / sessionWords.length) * 100}%`;
+
+            const hasHint = Boolean(wordObj.hint && wordObj.hint.trim());
+            document.getElementById('quiz-hint-container').style.display = hasHint ? 'block' : 'none';
+            document.getElementById('quiz-hint').innerText = wordObj.hint || '';
             document.getElementById('quiz-hint').style.display = 'none';
             document.getElementById('btn-hint').style.display = 'inline-block';
-            document.getElementById('quiz-progress').style.width = ((currentQuizIndex) / sessionWords.length) * 100 + "%";
 
-            let allOtherHebrew = fullDB.filter(w => w.id !== wordObj.id).map(w => w.heb);
-            let distractors = allOtherHebrew.sort(() => 0.5 - Math.random()).slice(0, 3);
-            let options = [wordObj.heb, ...distractors].sort(() => 0.5 - Math.random());
-
+            const options = buildQuizOptions(wordObj);
             const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = ''; 
+            optionsContainer.innerHTML = '';
+
             options.forEach(opt => {
-                let btn = document.createElement('button');
+                const btn = document.createElement('button');
                 btn.className = 'btn-option';
                 btn.innerText = opt;
-                btn.onclick = () => handleQuizAnswer(btn, opt === wordObj.heb);
+                btn.onclick = () => handleQuizAnswer(btn, opt === wordObj.heb.trim());
                 optionsContainer.appendChild(btn);
             });
+
             checkAutoSound(wordObj.eng);
         }
+
         function showHint() {
             usedHintInCurrentQuestion = true;
             document.getElementById('quiz-hint').style.display = 'block';
             document.getElementById('btn-hint').style.display = 'none';
         }
+
         function handleQuizAnswer(btnElement, isCorrect) {
-            let allBtns = document.querySelectorAll('.btn-option');
+            recordDailyActivity();
+            const allBtns = document.querySelectorAll('.btn-option');
             allBtns.forEach(b => b.onclick = null);
 
             if (isCorrect) {
                 btnElement.classList.add('correct');
                 triggerHaptic('success');
                 if (!usedHintInCurrentQuestion) currentQuizWord.points += 1;
-                if (currentQuizWord.points >= 2) currentQuizWord.status = "mastered";
+                if (currentQuizWord.points >= 2) {
+                    currentQuizWord.status = 'mastered';
+                    currentQuizWord.lastReviewed = Date.now();
+                }
             } else {
                 btnElement.classList.add('wrong');
                 triggerHaptic('error');
                 currentQuizWord.points = 0;
-                allBtns.forEach(b => { if (b.innerText === currentQuizWord.heb) b.classList.add('correct'); });
+                allBtns.forEach(b => {
+                    if (b.innerText === currentQuizWord.heb.trim()) b.classList.add('correct');
+                });
             }
-            
+
             saveWordProgress(currentQuizWord);
 
-            setTimeout(() => {
+            quizTimer = setTimeout(() => {
                 currentQuizIndex++;
                 if (currentQuizIndex >= sessionWords.length) {
                     sessionWords = [];
@@ -676,619 +1118,176 @@
                 } else {
                     loadQuizQuestion(sessionWords[currentQuizIndex]);
                 }
-            }, 1500); 
+            }, 1300);
         }
 
-        // ================= 🏋️ מנגנון חדר כושר (Active Recall חזרות) =================
+        // ================= 🏋️ חדר כושר לחזרות (SRS + Active Recall) =================
         function initReviewGym() {
-            // שולף את כל המילים במצב מאסטרד מכלל הרמות
-            let masteredWords = fullDB.filter(w => w.status === 'mastered');
-            
-            if(masteredWords.length === 0) {
-                document.getElementById('gym-active-zone').style.display = 'none';
-                document.getElementById('gym-empty-state').style.display = 'block';
+            const loadingEl = document.getElementById('gym-loading-state');
+            const emptyEl = document.getElementById('gym-empty-state');
+            const activeEl = document.getElementById('gym-active-zone');
+
+            if (!isDataLoaded) {
+                loadingEl.style.display = 'block';
+                emptyEl.style.display = 'none';
+                activeEl.style.display = 'none';
                 return;
             }
 
-            document.getElementById('gym-active-zone').style.display = 'block';
-            document.getElementById('gym-empty-state').style.display = 'none';
+            loadingEl.style.display = 'none';
+            const masteredWords = fullDB.filter(w => w.status === 'mastered');
 
-            // ערבוב ובחירה של עד 10 מילים לאימון
-            gymWords = masteredWords.sort(() => 0.5 - Math.random()).slice(0, 10);
+            if (masteredWords.length === 0) {
+                activeEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            activeEl.style.display = 'block';
+
+            // SRS: מיון לפי המילים שלא תורגלו הכי הרבה זמן (עם ערבוב עדין בין מילים באותו זמן)
+            const sortedByOldest = shuffle(masteredWords).sort((a, b) => (a.lastReviewed || 0) - (b.lastReviewed || 0));
+            gymWords = sortedByOldest.slice(0, 10);
             currentGymIndex = 0;
             loadGymWord();
         }
 
         function loadGymWord() {
             gymChecked = false;
+            gymTypoRetryUsed = false;
+            gymHintLetters = 0;
             currentGymWord = gymWords[currentGymIndex];
-            
-            document.getElementById('gym-pos').innerText = currentGymWord.pos;
-            document.getElementById('gym-heb').innerText = currentGymWord.heb;
-            
-            // החלפת המילה המרכזית במשפט בקו תחתון חסוי (Case Insensitive)
-            let regex = new RegExp('\\b' + currentGymWord.eng + '\\b', 'gi');
-            let hiddenSentence = currentGymWord.sentence.replace(regex, '_______');
-            document.getElementById('gym-sentence').innerText = hiddenSentence;
 
-            // איפוס קלט ופידבקים
-            let inputField = document.getElementById('gym-user-input');
+            document.getElementById('gym-pos').innerText = currentGymWord.pos || '';
+            document.getElementById('gym-heb').innerText = currentGymWord.heb;
+
+            const sentenceEl = document.getElementById('gym-sentence');
+            if (currentGymWord.sentence) {
+                sentenceEl.innerText = maskWordInSentence(currentGymWord.sentence, currentGymWord.eng);
+                sentenceEl.style.display = 'block';
+            } else {
+                sentenceEl.style.display = 'none';
+            }
+
+            const hintEl = document.getElementById('gym-hint-pattern');
+            hintEl.style.display = 'none';
+            hintEl.innerText = '';
+            document.getElementById('gym-btn-hint').disabled = false;
+
+            const inputField = document.getElementById('gym-user-input');
             inputField.value = '';
             inputField.className = 'gym-input';
             inputField.disabled = false;
-            
-            let feedback = document.getElementById('gym-feedback-msg');
+
+            const feedback = document.getElementById('gym-feedback-msg');
             feedback.style.display = 'none';
 
-            document.getElementById('gym-btn-action').innerText = "בדוק תשובה";
-            document.getElementById('gym-progress').style.width = (currentGymIndex / gymWords.length) * 100 + "%";
-            
+            document.getElementById('gym-btn-action').innerText = 'בדוק תשובה';
+            document.getElementById('gym-progress').style.width = `${(currentGymIndex / gymWords.length) * 100}%`;
+
             inputField.focus();
         }
 
+        function revealGymLetterHint() {
+            if (!currentGymWord || gymChecked) return;
+            const target = currentGymWord.eng.trim();
+            if (gymHintLetters < target.length - 1) {
+                gymHintLetters++;
+            }
+            const revealed = target.slice(0, gymHintLetters);
+            const masked = target.slice(gymHintLetters).replace(/[a-zA-Z]/g, '_');
+            const hintEl = document.getElementById('gym-hint-pattern');
+            hintEl.innerText = (revealed + masked).split('').join(' ');
+            hintEl.style.display = 'block';
+            document.getElementById('gym-user-input').focus();
+        }
+
         function checkGymAnswer() {
-            let inputField = document.getElementById('gym-user-input');
-            let feedback = document.getElementById('gym-feedback-msg');
-            let actionBtn = document.getElementById('gym-btn-action');
+            if (!currentGymWord) return;
+            const inputField = document.getElementById('gym-user-input');
+            const feedback = document.getElementById('gym-feedback-msg');
+            const actionBtn = document.getElementById('gym-btn-action');
 
             if (!gymChecked) {
-                // שלב הבדיקה
-                let userAnswer = inputField.value.trim().toLowerCase();
-                let correctAnswer = currentGymWord.eng.trim().toLowerCase();
+                const userAnswer = inputField.value.trim().toLowerCase();
+                const correctAnswer = currentGymWord.eng.trim().toLowerCase();
 
+                if (!userAnswer) {
+                    inputField.focus();
+                    return;
+                }
+
+                // בדיקת שגיאת כתיב קלה (הזדמנות תיקון אחת)
+                const dist = levenshtein(userAnswer, correctAnswer);
+                const maxTypoDist = correctAnswer.length >= 8 ? 2 : 1;
+                if (dist > 0 && dist <= maxTypoDist && !gymTypoRetryUsed) {
+                    gymTypoRetryUsed = true;
+                    inputField.className = 'gym-input typo';
+                    feedback.innerText = '✏️ כמעט! יש שגיאת כתיב קלה – נסה לתקן';
+                    feedback.style.color = 'var(--warning)';
+                    feedback.style.display = 'block';
+                    triggerHaptic('warning');
+                    inputField.focus();
+                    return;
+                }
+
+                recordDailyActivity();
                 inputField.disabled = true;
+                document.getElementById('gym-btn-hint').disabled = true;
                 gymChecked = true;
 
                 if (userAnswer === correctAnswer) {
-                    inputField.classList.add('correct');
-                    feedback.innerText = "🎯 בול פגיעה! אלוף.";
-                    feedback.style.color = "var(--success)";
+                    inputField.className = 'gym-input correct';
+                    feedback.innerText = gymHintLetters > 0
+                        ? `✅ נכון! (${currentGymWord.eng})`
+                        : '🎯 בול פגיעה! השליטה נשמרה.';
+                    feedback.style.color = 'var(--success)';
+                    currentGymWord.lastReviewed = Date.now();
+                    saveWordProgress(currentGymWord);
                     triggerHaptic('success');
                     checkAutoSound(currentGymWord.eng);
                 } else {
-                    inputField.classList.add('wrong');
-                    feedback.innerHTML = `❌ פספוס. התשובה הנכונה: <strong>${currentGymWord.eng}</strong>`;
-                    feedback.style.color = "var(--danger)";
+                    inputField.className = 'gym-input wrong';
+                    feedback.innerHTML = `❌ התשובה הנכונה: <strong>${currentGymWord.eng}</strong><br><span style="font-size:0.88rem; font-weight:400;">המילה הוחזרה ללמידה ברמה ${currentGymWord.level} לחיזוק</span>`;
+                    feedback.style.color = 'var(--danger)';
+                    // הורדה חזרה לחיזוק כדי לסגור פער אמיתי בזיכרון
+                    currentGymWord.status = 'learning';
+                    currentGymWord.points = 1;
+                    currentGymWord.lastReviewed = Date.now();
+                    saveWordProgress(currentGymWord);
                     triggerHaptic('error');
                     speakWord(currentGymWord.eng);
                 }
+
                 feedback.style.display = 'block';
-                actionBtn.innerText = "המשך למילה הבאה ➔";
+                actionBtn.innerText = currentGymIndex + 1 >= gymWords.length ? 'סיום אימון 🏆' : 'המשך למילה הבאה ➔';
             } else {
-                // מעבר למילה הבאה
                 currentGymIndex++;
-                if(currentGymIndex >= gymWords.length) {
-                    alert("🎯 סיימת את אימון חדר הכושר! שמרת על השריר חד.");
-                    switchTab('screen-dashboard');
+                if (currentGymIndex >= gymWords.length) {
+                    document.getElementById('gym-progress').style.width = '100%';
+                    showModal('💪', 'אימון חדר הכושר הושלם!', 'שמרת על הזיכרון חד. כל מילה שטעית בה הוחזרה לחיזוק ברמה שלה.', () => switchTab('screen-dashboard'));
                 } else {
                     loadGymWord();
                 }
             }
         }
 
-        // האזנה למקש אנטר בהקלדה בחדר כושר
-        document.getElementById('gym-user-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+        // האזנה גלובלית ל-Enter בחדר הכושר ובמודאל (עובד גם כשהשדה נעול)
+        document.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter') return;
+            if (document.getElementById('app-modal').classList.contains('open')) {
+                e.preventDefault();
+                closeModal();
+                return;
+            }
+            const gymActive = document.getElementById('screen-review-gym').classList.contains('active') &&
+                              document.getElementById('gym-active-zone').style.display !== 'none';
+            if (gymActive) {
+                e.preventDefault();
                 checkGymAnswer();
             }
         });
-    </script>
-</body>
-</html>
-            --bg-color: #f4f6f8; 
-            --card-bg: #ffffff;
-            --text-main: #2b2d42; 
-            --text-secondary: #8d99ae;
-            --success: #2a9d8f; 
-            --danger: #e76f51; 
-            --warning: #f4a261;
-            --sentence-bg: #f8f9fa; 
-            --badge-bg: #e0e0e0; 
-            --quiz-hint-bg: #fff3cd;
-            --btn-sec-bg: #ffffff;
-            --border-color: #e0e0e0;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #121212; 
-            --card-bg: #1e1e1e;
-            --text-main: #f0f0f0; 
-            --text-secondary: #aaaaaa;
-            --sentence-bg: #2b2b2b; 
-            --badge-bg: #333333; 
-            --quiz-hint-bg: #382d10;
-            --btn-sec-bg: #2a2a2a;
-            --border-color: #444444;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
-
-        .screen { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.4s ease; flex-direction: column; align-items: center; }
-        .screen.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .header { text-align: center; width: 100%; margin-bottom: 30px; position: relative; }
-        .settings-icon { position: absolute; left: 0; top: 0; font-size: 1.5rem; cursor: pointer; background: none; border: none; color: var(--text-secondary); }
-        .progress-bar { width: 100%; height: 8px; background-color: var(--badge-bg); border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; background-color: var(--level-color); transition: width 0.4s ease; }
-
-        .level-btn { width: 100%; background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: none; font-size: 1.2rem; font-weight: 700; cursor: default; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; border-right: 6px solid #ccc; opacity: 0.5; color: var(--text-secondary); margin-bottom: 15px;}
-        .level-btn.loaded { opacity: 1; cursor: pointer; pointer-events: auto; color: var(--text-main); }
-        .level-btn.loaded:active { transform: scale(0.97); }
-
-        #levels-container { width: 100%; display: flex; flex-direction: column; max-height: 60vh; overflow-y: auto; padding-right: 5px; padding-bottom: 20px; }
-        #levels-container::-webkit-scrollbar { width: 6px; }
-        #levels-container::-webkit-scrollbar-thumb { background-color: var(--text-secondary); border-radius: 10px; }
-
-        #loading-msg { color: var(--text-secondary); margin-bottom: 20px; font-weight: 600; text-align: center;}
-
-        .triage-card { background: var(--card-bg); width: 100%; padding: 25px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; border-top: 6px solid var(--level-color); cursor: pointer; transition: 0.2s; }
-        .triage-eng { font-size: 2.5rem; font-weight: 700; direction: ltr; margin-bottom: 10px; color: var(--text-main);}
-        .triage-heb { font-size: 1.8rem; color: var(--level-color); margin-bottom: 25px; display: none; }
-        .triage-actions { display: flex; gap: 15px; width: 100%; display: none; }
-        .btn-triage { flex: 1; padding: 15px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; color: white; transition: 0.2s; }
-        .btn-know { background-color: var(--success); }
-        .btn-dont-know { background-color: var(--danger); }
-        .btn-triage:active { transform: scale(0.95); }
-
-        .card-container { width: 100%; height: 400px; perspective: 1000px; cursor: pointer; margin-bottom: 30px; }
-        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 24px; }
-        .card.is-flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--card-bg); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; border-top: 8px solid var(--level-color); }
-        .card-back { transform: rotateY(180deg); }
-        .word-eng { font-size: 2.8rem; font-weight: 700; margin-bottom: 10px; direction: ltr; color: var(--text-main);}
-        .part-of-speech { font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; }
-        .word-heb { font-size: 2.5rem; font-weight: 700; color: var(--level-color); margin-bottom: 25px; }
-        .sentence { font-size: 1.2rem; color: var(--text-main); direction: ltr; line-height: 1.6; padding: 15px; background-color: var(--sentence-bg); border-radius: 12px; width: 100%; border-left: 4px solid var(--level-color); }
-        
-        .quiz-question { font-size: 2.5rem; font-weight: 700; direction: ltr; margin-bottom: 30px; text-align: center; color: var(--level-color); }
-        .quiz-options { display: flex; flex-direction: column; gap: 15px; width: 100%; }
-        .btn-option { background: var(--card-bg); border: 2px solid var(--border-color); color: var(--text-main); padding: 18px; border-radius: 16px; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
-        .btn-option:active { transform: scale(0.98); }
-        .btn-option.correct { background-color: var(--success); color: white; border-color: var(--success); }
-        .btn-option.wrong { background-color: var(--danger); color: white; border-color: var(--danger); }
-        
-        .hint-container { margin-top: 25px; width: 100%; text-align: center; }
-        .btn-hint { background: none; border: none; color: var(--warning); font-size: 1.2rem; font-weight: 600; cursor: pointer; padding: 10px; }
-        .hint-text { display: none; margin-top: 15px; font-size: 1.1rem; color: var(--text-main); background: var(--quiz-hint-bg); padding: 15px; border-radius: 10px; direction: ltr; border-left: 4px solid var(--warning); }
-
-        .controls { display: flex; gap: 15px; width: 100%; }
-        .btn-main { flex: 1; padding: 16px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 16px; cursor: pointer; transition: 0.2s; background-color: var(--level-color); color: #ffffff; }
-        .btn-secondary { background-color: var(--btn-sec-bg); color: var(--text-main); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); flex: 1; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer;}
-        .btn-reset { background-color: var(--card-bg); color: var(--danger); border: 2px solid var(--danger); width: 100%; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .status-badge { background: var(--badge-bg); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 10px; display: inline-block; color: var(--text-main);}
-        
-        .setting-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px; background: var(--card-bg); border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);}
-        .setting-row select { padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--btn-sec-bg); color: var(--text-main); font-size: 1rem;}
-    </style>
-</head>
-<body>
-
-    <!-- ================= דאשבורד ================= -->
-    <div id="screen-dashboard" class="screen active">
-        <div class="header">
-            <button class="settings-icon" onclick="switchScreen('screen-settings')">⚙️</button>
-            <h2 style="font-size: 2rem;">הלומדה של אסף</h2>
-            <p style="color: var(--text-secondary); margin-top: 5px;">מערכת למידה חכמה</p>
-        </div>
-        <div id="loading-msg">מתחבר לגוגל שיטס שלך... ⏳</div>
-        <div id="levels-container"></div>
-    </div>
-
-    <!-- ================= מסננת ================= -->
-    <div id="screen-triage" class="screen">
-        <div class="header">
-            <h2 id="triage-title">מסננת מילים</h2>
-            <div class="progress-bar"><div class="progress-fill" id="triage-progress"></div></div>
-        </div>
-        <div class="triage-card" onclick="revealTriageHebrew()">
-            <div class="triage-eng" id="triage-eng">Word</div>
-            <div id="triage-tap-hint" style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 20px;">👆 הקלק על הכרטיסייה כדי לראות תרגום</div>
-            <div class="triage-heb" id="triage-heb">מילה</div>
-            <button class="btn-secondary" id="triage-audio-btn" style="margin-bottom: 25px; width: 100%; display: none;" onclick="speakWord(currentTriageWord.eng); event.stopPropagation();">🔊 השמע</button>
-            <div class="triage-actions" id="triage-actions">
-                <button class="btn-triage btn-dont-know" onclick="handleTriage(false); event.stopPropagation();">❌ לא מכיר</button>
-                <button class="btn-triage btn-know" onclick="handleTriage(true); event.stopPropagation();">✅ מכיר</button>
-            </div>
-        </div>
-        <button class="btn-secondary" style="width:100%; margin-top: 15px;" onclick="switchScreen('screen-dashboard')">חזור לתפריט</button>
-    </div>
-
-    <!-- ================= כרטיסיות ================= -->
-    <div id="screen-flashcards" class="screen">
-        <div class="header">
-            <h2>זמן שינון</h2>
-            <div class="status-badge" id="fc-points-badge">נקודות שליטה: 0/2</div>
-            <div class="progress-bar"><div class="progress-fill" id="fc-progress"></div></div>
-        </div>
-        <div class="card-container" id="flashcard" onclick="toggleCard()">
-            <div class="card" id="card-inner">
-                <div class="card-face card-front">
-                    <div class="part-of-speech" id="fc-pos">Noun</div>
-                    <div class="word-eng" id="fc-eng">Word</div>
-                    <div style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 30px;">הקלק כדי להפוך</div>
-                </div>
-                <div class="card-face card-back">
-                    <div class="word-heb" id="fc-heb">מילה</div>
-                    <div class="sentence" id="fc-sentence">Sentence</div>
-                </div>
-            </div>
-        </div>
-        <div class="controls">
-            <button class="btn-secondary" onclick="speakWord(currentFlashcardWord.eng)">🔊 השמע</button>
-            <button class="btn-main" onclick="nextFlashcard()">הבא ➔</button>
-        </div>
-    </div>
-
-    <!-- ================= צומת דרכים אחרי כרטיסיות ================= -->
-    <div id="screen-flashcard-choice" class="screen">
-        <div class="header">
-            <h2 style="font-size: 2.2rem; color: var(--level-color);">סיימת לשנן!</h2>
-            <p style="margin-top: 10px; font-size: 1.1rem;">מה עושים עכשיו?</p>
-        </div>
-        <button class="btn-secondary" style="width:100%; margin-bottom: 20px;" onclick="startFlashcards()">🔄 חזור שוב על הכרטיסיות</button>
-        <button class="btn-main" style="width:100%; font-size: 1.3rem;" onclick="startQuiz()">📝 יאללה למבחן</button>
-    </div>
-
-    <!-- ================= מבחן ================= -->
-    <div id="screen-quiz" class="screen">
-        <div class="header">
-            <h2>מיני-מבחן</h2>
-            <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
-        </div>
-        <div class="quiz-question" id="quiz-eng">Word</div>
-        <div class="quiz-options" id="quiz-options"></div>
-        <div class="hint-container">
-            <button class="btn-hint" id="btn-hint" onclick="showHint()">💡 לחץ לרמז משפט</button>
-            <div class="hint-text" id="quiz-hint">Hint</div>
-        </div>
-    </div>
-
-    <!-- ================= הגדרות ================= -->
-    <div id="screen-settings" class="screen">
-        <div class="header">
-            <h2>הגדרות מערכת</h2>
-        </div>
-        
-        <div class="setting-row">
-            <span>מראה:</span>
-            <select id="theme-select" onchange="changeTheme(this.value)">
-                <option value="system">מערכת</option>
-                <option value="light">בהיר</option>
-                <option value="dark">כהה (Dark Mode)</option>
-            </select>
-        </div>
-
-        <div class="setting-row">
-            <span>קריאת מילים אוטומטית:</span>
-            <select id="auto-sound-select" onchange="localStorage.setItem('asaf_vocab_autosound', this.value)">
-                <option value="off">כבוי</option>
-                <option value="on">מופעל</option>
-            </select>
-        </div>
-
-        <div style="margin-top: 30px; width: 100%;">
-            <p style="text-align: center; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem;">אזור סכנה</p>
-            <button class="btn-reset" onclick="resetAppProgress()">🗑️ איפוס כל ההתקדמות</button>
-        </div>
-
-        <button class="btn-main" style="width:100%; margin-top: 30px;" onclick="switchScreen('screen-dashboard')">שמור וחזור</button>
-    </div>
-
-    <script>
-        const sheetId = '1YYCJ8-g4v2tK9hLLK4U64MyT3PPDeZR6C9IEAwOKYDc';
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-
-        let fullDB = [], currentLevelDB = [], sessionWords = []; 
-        let currentTriageIndex = 0, currentFlashcardIndex = 0, currentQuizIndex = 0;
-        let usedHintInCurrentQuestion = false;
-        let currentTriageWord, currentFlashcardWord, currentQuizWord;
-
-        // --- הגדרות ומראה ---
-        function applyTheme(theme) {
-            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        }
-        function changeTheme(theme) {
-            localStorage.setItem('asaf_vocab_theme', theme);
-            applyTheme(theme);
-        }
-
-        // --- אתחול מערכת ---
-        window.onload = () => {
-            let savedTheme = localStorage.getItem('asaf_vocab_theme') || 'system';
-            document.getElementById('theme-select').value = savedTheme;
-            applyTheme(savedTheme);
-            
-            let savedSound = localStorage.getItem('asaf_vocab_autosound') || 'off';
-            document.getElementById('auto-sound-select').value = savedSound;
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if(localStorage.getItem('asaf_vocab_theme') === 'system') applyTheme('system');
-            });
-
-            fetch(url)
-                .then(res => res.text())
-                .then(text => {
-                    const jsonStr = text.substring(47).slice(0, -2);
-                    const json = JSON.parse(jsonStr);
-                    
-                    let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
-
-                    fullDB = json.table.rows.map(row => {
-                        let id = row.c[0] ? row.c[0].v : null;
-                        let saved = savedProgress[id] || { status: "new", points: 0 };
-                        
-                        return {
-                            id: id,
-                            level: row.c[1] ? Number(row.c[1].v) : 1,
-                            eng: row.c[2] ? row.c[2].v : '',
-                            heb: row.c[3] ? row.c[3].v : '',
-                            pos: row.c[4] ? row.c[4].v : '',
-                            sentence: row.c[5] ? row.c[5].v : '',
-                            hint: row.c[6] ? row.c[6].v : '',
-                            points: saved.points,
-                            status: saved.status
-                        };
-                    }).filter(w => typeof w.id === 'number');
-
-                    document.getElementById('loading-msg').innerText = "✅ מחובר בהצלחה לגוגל שיטס!";
-                    
-                    let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
-                    const levelsContainer = document.getElementById('levels-container');
-                    levelsContainer.innerHTML = '';
-                    const colors = ['#0077b6', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#9d4edd'];
-                    
-                    for (let i = 1; i <= 30; i++) {
-                        let btn = document.createElement('button');
-                        let color = colors[(i - 1) % colors.length];
-                        
-                        if (i <= maxUnlocked) {
-                            btn.className = 'level-btn loaded';
-                            btn.style.borderRightColor = color;
-                            btn.innerHTML = `<span style="color: ${color}">רמה ${i}</span> <span style="color: ${color}">➔</span>`;
-                            btn.onclick = () => startLevel(i, color);
-                        } else {
-                            btn.className = 'level-btn';
-                            btn.innerHTML = `<span>רמה ${i}</span> <span>🔒 נעול</span>`;
-                        }
-                        levelsContainer.appendChild(btn);
-                    }
-                })
-                .catch(err => {
-                    console.error("Error loading words:", err);
-                    document.getElementById('loading-msg').innerText = "❌ שגיאה בחיבור לגוגל שיטס.";
-                });
-        };
-
-        function saveWordProgress(wordObj) {
-            let savedProgress = JSON.parse(localStorage.getItem('asaf_vocab_progress')) || {};
-            savedProgress[wordObj.id] = { status: wordObj.status, points: wordObj.points };
-            localStorage.setItem('asaf_vocab_progress', JSON.stringify(savedProgress));
-        }
-
-        function resetAppProgress() {
-            if(confirm("⚠️ אזהרה: פעולה זו תמחק את כל ההתקדמות שלך ותנעל את השלבים בחזרה. האם אתה בטוח?")) {
-                localStorage.removeItem('asaf_vocab_progress');
-                localStorage.removeItem('asaf_vocab_level');
-                alert("הנתונים אופסו בהצלחה. האפליקציה תתרענן כעת.");
-                location.reload();
-            }
-        }
-
-        function getWordsByStatus(status) { return currentLevelDB.filter(w => w.status === status); }
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-        function speakWord(word) {
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = 'en-US'; utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function checkAutoSound(word) {
-            if(localStorage.getItem('asaf_vocab_autosound') === 'on') {
-                speakWord(word);
-            }
-        }
-
-        // ================= התחלת רמה =================
-        function startLevel(levelNum, colorHex) {
-            document.documentElement.style.setProperty('--level-color', colorHex);
-            document.getElementById('triage-title').innerText = `מסננת מילים - רמה ${levelNum}`;
-            currentLevelDB = fullDB.filter(w => w.level === levelNum);
-            
-            if(currentLevelDB.length === 0) {
-                alert("עוד לא הזנת מילים לרמה הזו בגוגל שיטס!");
-                return;
-            }
-            
-            // המוח החדש נכנס לפעולה
-            manageSessionFlow();
-        }
-
-        // ================= מנהל התור החכם (הפתרון לבאג) =================
-        function manageSessionFlow() {
-            // 1. קודם כל בודקים אם יש מילים בסטטוס "למידה" שצריך לסיים
-            let allLearning = getWordsByStatus("learning");
-            if (allLearning.length > 0) {
-                // לוקחים עד 10 מילים כדי לא להעמיס אם יצאת אחרי הרבה סינונים
-                sessionWords = allLearning.slice(0, 10);
-                startFlashcards();
-                return;
-            }
-
-            // 2. אם הכל נקי, בודקים אם נשארו מילים חדשות לסנן
-            let newWords = getWordsByStatus("new");
-            if (newWords.length > 0) {
-                switchScreen('screen-triage');
-                currentTriageIndex = 0;
-                loadTriageWord(newWords[currentTriageIndex]);
-                return;
-            }
-
-            // 3. אם אין מה ללמוד ואין מה לסנן - ניצחת את הרמה!
-            let currentLevel = currentLevelDB[0].level;
-            let maxUnlocked = parseInt(localStorage.getItem('asaf_vocab_level')) || 1;
-            
-            if (currentLevel >= maxUnlocked && currentLevel < 30) {
-                localStorage.setItem('asaf_vocab_level', currentLevel + 1);
-                alert("🎉 אלוף! השתלטת על כל המילים. הרמה הבאה נפתחה עבורך!");
-            } else {
-                alert("כל הכבוד! סיימת לאמן את כל המילים ברמה זו.");
-            }
-            location.reload(); 
-        }
-
-        // ================= מסננת =================
-        function loadTriageWord(wordObj) {
-            currentTriageWord = wordObj;
-            document.getElementById('triage-eng').innerText = wordObj.eng;
-            document.getElementById('triage-heb').innerText = wordObj.heb;
-            
-            checkAutoSound(wordObj.eng);
-
-            let totalWords = currentLevelDB.length;
-            let masteredCount = getWordsByStatus("mastered").length;
-            let learningCount = getWordsByStatus("learning").length;
-            let progressPercent = ((masteredCount + learningCount) / totalWords) * 100;
-            document.getElementById('triage-progress').style.width = progressPercent + "%";
-
-            document.getElementById('triage-heb').style.display = 'none';
-            document.getElementById('triage-audio-btn').style.display = 'none';
-            document.getElementById('triage-actions').style.display = 'none';
-            document.getElementById('triage-tap-hint').style.display = 'block';
-        }
-
-        function revealTriageHebrew() {
-            document.getElementById('triage-heb').style.display = 'block';
-            document.getElementById('triage-audio-btn').style.display = 'block';
-            document.getElementById('triage-actions').style.display = 'flex';
-            document.getElementById('triage-tap-hint').style.display = 'none';
-        }
-
-        function handleTriage(knows) {
-            if (knows) {
-                currentTriageWord.status = "mastered";
-                currentTriageWord.points = 2;
-            } else {
-                currentTriageWord.status = "learning";
-                sessionWords.push(currentTriageWord);
-            }
-            
-            saveWordProgress(currentTriageWord);
-
-            currentTriageIndex++;
-            let newWords = getWordsByStatus("new");
-            
-            // אם אספנו מספיק מילים לאימון או שנגמרו המילים החדשות
-            if (sessionWords.length >= 10 || newWords.length === 0) { 
-                if(sessionWords.length > 0) {
-                    startFlashcards();
-                } else {
-                    manageSessionFlow(); // בדיקה חכמה מה הלאה
-                }
-            } else {
-                loadTriageWord(newWords[0]); 
-            }
-        }
-
-        // ================= כרטיסיות =================
-        function startFlashcards() {
-            switchScreen('screen-flashcards');
-            currentFlashcardIndex = 0;
-            loadFlashcard(sessionWords[currentFlashcardIndex]);
-        }
-        function toggleCard() { document.getElementById('card-inner').classList.toggle('is-flipped'); }
-        function loadFlashcard(wordObj) {
-            currentFlashcardWord = wordObj;
-            document.getElementById('card-inner').classList.remove('is-flipped');
-            setTimeout(() => {
-                document.getElementById('fc-eng').innerText = wordObj.eng;
-                document.getElementById('fc-pos').innerText = wordObj.pos;
-                document.getElementById('fc-heb').innerText = wordObj.heb;
-                document.getElementById('fc-sentence').innerText = wordObj.sentence;
-                document.getElementById('fc-points-badge').innerText = `נקודות שליטה: ${wordObj.points}/2`;
-                document.getElementById('fc-progress').style.width = ((currentFlashcardIndex) / sessionWords.length) * 100 + "%";
-                checkAutoSound(wordObj.eng);
-            }, 200);
-        }
-        function nextFlashcard() {
-            currentFlashcardIndex++;
-            if (currentFlashcardIndex >= sessionWords.length) {
-                switchScreen('screen-flashcard-choice');
-            } else {
-                loadFlashcard(sessionWords[currentFlashcardIndex]);
-            }
-        }
-
-        // ================= מבחן =================
-        function startQuiz() {
-            switchScreen('screen-quiz');
-            currentQuizIndex = 0;
-            loadQuizQuestion(sessionWords[currentQuizIndex]);
-        }
-        function loadQuizQuestion(wordObj) {
-            currentQuizWord = wordObj;
-            usedHintInCurrentQuestion = false;
-            
-            document.getElementById('quiz-eng').innerText = wordObj.eng;
-            document.getElementById('quiz-hint').innerText = wordObj.hint;
-            document.getElementById('quiz-hint').style.display = 'none';
-            document.getElementById('btn-hint').style.display = 'inline-block';
-            document.getElementById('quiz-progress').style.width = ((currentQuizIndex) / sessionWords.length) * 100 + "%";
-
-            let allOtherHebrew = fullDB.filter(w => w.id !== wordObj.id).map(w => w.heb);
-            let distractors = allOtherHebrew.sort(() => 0.5 - Math.random()).slice(0, 3);
-            let options = [wordObj.heb, ...distractors].sort(() => 0.5 - Math.random());
-
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = ''; 
-            options.forEach(opt => {
-                let btn = document.createElement('button');
-                btn.className = 'btn-option';
-                btn.innerText = opt;
-                btn.onclick = () => handleQuizAnswer(btn, opt === wordObj.heb);
-                optionsContainer.appendChild(btn);
-            });
-            checkAutoSound(wordObj.eng);
-        }
-        function showHint() {
-            usedHintInCurrentQuestion = true;
-            document.getElementById('quiz-hint').style.display = 'block';
-            document.getElementById('btn-hint').style.display = 'none';
-        }
-        function handleQuizAnswer(btnElement, isCorrect) {
-            let allBtns = document.querySelectorAll('.btn-option');
-            allBtns.forEach(b => b.onclick = null);
-
-            if (isCorrect) {
-                btnElement.classList.add('correct');
-                if (!usedHintInCurrentQuestion) currentQuizWord.points += 1;
-                if (currentQuizWord.points >= 2) currentQuizWord.status = "mastered";
-            } else {
-                btnElement.classList.add('wrong');
-                currentQuizWord.points = 0;
-                allBtns.forEach(b => { if (b.innerText === currentQuizWord.heb) b.classList.add('correct'); });
-            }
-            
-            saveWordProgress(currentQuizWord);
-
-            setTimeout(() => {
-                currentQuizIndex++;
-                if (currentQuizIndex >= sessionWords.length) endSession();
-                else loadQuizQuestion(sessionWords[currentQuizIndex]);
-            }, 1500); 
-        }
-        function endSession() {
-            sessionWords = [];
-            manageSessionFlow(); // חזרה למוח המרכזי כדי שיחליט מה לעשות עכשיו
-        }
     </script>
 </body>
 </html>
